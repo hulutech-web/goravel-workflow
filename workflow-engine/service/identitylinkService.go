@@ -92,7 +92,7 @@ func AddCandidateUserTx(userID, company string, step, taskID, procInstID int, tx
 	// return err2
 }
 
-//AddParticipantTx AddParticipantTx
+// AddParticipantTx AddParticipantTx
 // 添加任务参与人
 func AddParticipantTx(userID, username, company, comment string, taskID, procInstID, step int, tx *gorm.DB) error {
 	i := &model.Identitylink{
@@ -114,7 +114,7 @@ func IfParticipantByTaskID(userID, company string, taskID int) (bool, error) {
 	return model.IfParticipantByTaskID(userID, company, taskID)
 }
 
-// DelCandidateByProcInstID DelCandidateByProcInstID
+// DelCandidateByProcInstID
 // 删除历史候选人
 func DelCandidateByProcInstID(procInstID int, tx *gorm.DB) error {
 	return model.DelCandidateByProcInstID(procInstID, tx)

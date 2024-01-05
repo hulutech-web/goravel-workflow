@@ -1,30 +1,28 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
-	"net/http"
-	"strconv"
-
 	"github.com/mumushuiding/util"
 	"go-workflow/workflow-engine/service"
+	"net/http"
 )
 
 // FindParticipantByProcInstID 根据流程id查询流程参与者
 func FindParticipantByProcInstID(writer http.ResponseWriter, request *http.Request) {
-	if request.Method != "GET" {
-		util.ResponseErr(writer, "只支持get方法！！")
-		return
+	type Data struct {
+		ProcInstID int `json:"procInstID"`
 	}
-	request.ParseForm()
-	if len(request.Form["procInstID"]) == 0 {
+	var data Data
+	json.NewDecoder(request.Body).Decode(&data)
+	fmt.Println("data:", data)
+
+	if data.ProcInstID == 0 {
 		util.ResponseErr(writer, "流程 procInstID 不能为空")
 		return
 	}
-	procInstID, err := strconv.Atoi(request.Form["procInstID"][0])
-	if err != nil {
-		util.ResponseErr(writer, err)
-		return
-	}
+	procInstID := data.ProcInstID
+
 	result, err := service.FindParticipantByProcInstID(procInstID)
 	if err != nil {
 		util.ResponseErr(writer, err)
