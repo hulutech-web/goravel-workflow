@@ -6,8 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="466233d9-d59d-4e7b-ac74-cf5f3f64897e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow-controller/identitylinkController.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-controller/identitylinkController.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workflow-engine/service/identitylinkService.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-engine/service/identitylinkService.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow-controller/procdefController.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-controller/procdefController.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow-engine/model/ACT_RE_PROCDEF.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-engine/model/ACT_RE_PROCDEF.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow-engine/service/procdefService.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-engine/service/procdefService.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow-engine/service/taskService.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-engine/service/taskService.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workflow-router/router.go" beforeDir="false" afterPath="$PROJECT_DIR$/workflow-router/router.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,12 +88,20 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+        <line-breakpoint type="DlvLineBreakpoint">
           <url>file://$PROJECT_DIR$/workflow-controller/processController.go</url>
           <line>31</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
+        <line-breakpoint type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/workflow-controller/procdefController.go</url>
+          <line>77</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
       </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="DlvErrorBreakpoint" />
+      </default-breakpoints>
     </breakpoint-manager>
   </component>
 </project>

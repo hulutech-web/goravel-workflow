@@ -181,6 +181,11 @@ func (p *Procdef) getMaps() map[string]interface{} {
 	return maps
 }
 
+// @袁浩 FindProcdefByID find by id
+func FindProcdefByID(id int) (*model.Procdef, error) {
+	return model.FindProcdefByID(id)
+}
+
 // DelProcdefByID del by id
 func DelProcdefByID(id int) error {
 	return model.DelProcdefByID(id)

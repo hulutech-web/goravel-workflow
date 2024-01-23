@@ -338,7 +338,7 @@ func MoveStage(nodeInfos []*flow.NodeInfo, userID, username, company, comment, c
 	return MoveToPrevStage(nodeInfos, userID, company, taskID, procInstID, step, tx)
 }
 
-// MoveToNextStage MoveToNextStage
+// MoveToNextStage
 // 通过
 func MoveToNextStage(nodeInfos []*flow.NodeInfo, userID, company string, currentTaskID, procInstID, step int, tx *gorm.DB) error {
 	var currentTime = util.FormatDate(time.Now(), util.YYYY_MM_DD_HH_MM_SS)

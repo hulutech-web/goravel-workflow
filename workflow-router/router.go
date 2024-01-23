@@ -27,10 +27,14 @@ func crossOrigin(h http.HandlerFunc) http.HandlerFunc {
 }
 func setMux() {
 	Mux.HandleFunc("/api/v1/workflow/", controller.Index)
+	Mux.HandleFunc("/api/v1/workflow/token", controller.MockGetToken)
 	//-------------------------流程定义----------------------
+
 	Mux.HandleFunc("/api/v1/workflow/procdef/save", intercept(controller.SaveProcdef))
 	Mux.HandleFunc("/api/v1/workflow/procdef/saveByToken", intercept(controller.SaveProcdefByToken))
-	Mux.HandleFunc("/api/v1/workflow/procdef/findAll", intercept(controller.FindAllProcdefPage))
+	Mux.HandleFunc("/api/v1/workflow/procdef/findAll", intercept(controller.FindAllProcdefPage)) // 所有可用流程√
+	//@袁浩
+	Mux.HandleFunc("/api/v1/workflow/procdef/findById", intercept(controller.FindProcdefById))
 	Mux.HandleFunc("/api/v1/workflow/procdef/delById", intercept(controller.DelProcdefByID))
 
 	// -----------------------流程实例-----------------------

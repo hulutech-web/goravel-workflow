@@ -54,6 +54,10 @@ func GetProcdefByID(id int) (*Procdef, error) {
 	return p, err
 }
 
+func FindProcdefByID(id int) (*Procdef, error) {
+	return GetProcdefByID(id)
+}
+
 // DelProcdefByID del by id
 // 根据id删除
 func DelProcdefByID(id int) error {
