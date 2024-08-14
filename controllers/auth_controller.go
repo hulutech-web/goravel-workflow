@@ -4,12 +4,10 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/validation"
-	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
 )
 
 type AuthController struct {
-	*common.WechatService
 }
 
 func NewAuthController() *AuthController {
@@ -185,37 +183,6 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 			})
 		}
 	}
-}
-
-func (r *AuthController) Openid(ctx http.Context) http.Response {
-
-	code := ctx.Request().Input("code")
-	openid, unionid, err := r.GetOpenidByCode(code)
-	if err != nil {
-		ctx.Request().AbortWithStatusJson(500, http.Json{
-			"message": "获取openid失败" + err.Error(),
-		})
-		return nil
-	}
-	return ctx.Response().Success().Json(http.Json{
-		"openid":  openid,
-		"unionid": unionid,
-	})
-}
-
-// Phone 获取手机号
-func (r *AuthController) Phone(ctx http.Context) http.Response {
-	code := ctx.Request().Input("code")
-	phone, err := r.GetPhoneNumberByCode(code)
-	if err != nil {
-		ctx.Request().AbortWithStatusJson(500, http.Json{
-			"msg": "获取手机号失败" + err.Error(),
-		})
-		return nil
-	}
-	return ctx.Response().Success().Json(http.Json{
-		"phone": phone,
-	})
 }
 
 // Logout 退出登录
