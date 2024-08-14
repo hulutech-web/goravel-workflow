@@ -35,15 +35,7 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 		"database/seeders":    app.DatabasePath("seeders"),
 		"database/factories":  app.DatabasePath("factories"),
 	})
-	//	模型迁移
-	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
-		"models/workflow": app.Path("models"),
-	})
 
-	//	服务文件
-	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
-		"app/services": app.Path("services"),
-	})
 	// 配置文件
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
 		"config/workflow.go": app.ConfigPath("workflow.go"),
