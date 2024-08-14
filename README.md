@@ -128,7 +128,7 @@ router := app.MakeRoute()
 ```
 
 ### 三、前端集成
-请访问前端框架[goravel-workflow-vue](https://github.com/hulu-web/goravel-workflow-vue)下载安装扩展，并按照文档进行集成
+请访问前端框架[goravel-workflow-vue](https://github.com/hulutech-web/goravel-workflow-vue)下载安装扩展，并按照文档进行集成
 
 ### 四、接口文档
-请访问前端框架[goravel-workflow-doc](https://github.com/hulu-web/goravel-workflow-vuepress)进行查看
+请访问前端框架[goravel-workflow-doc](https://github.com/hulutech-web/goravel-workflow-vuepress)进行查看
