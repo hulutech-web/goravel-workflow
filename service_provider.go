@@ -31,9 +31,12 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 
 	//	数据库迁移
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
-		"migrations": app.DatabasePath("database/migrations"),
-		"seeders":    app.DatabasePath("database/seeders"),
-		"factories":  app.DatabasePath("database/factories"),
+		"database/migrations": app.DatabasePath("database/migrations"),
+		"database/seeders":    app.DatabasePath("database/seeders"),
+		"database/factories":  app.DatabasePath("database/factories"),
+	})
+	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
+		"config/workflow.go": app.ConfigPath("workflow.go"),
 	})
 
 }
@@ -41,8 +44,5 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 func (receiver *ServiceProvider) Boot(app foundation.Application) {
 	app.Commands([]console.Command{
 		commands.NewPublishWorkflow(),
-	})
-	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
-		"config/workflow.go": app.ConfigPath("workflow.go"),
 	})
 }
