@@ -5,16 +5,16 @@ import (
 	"github.com/hulutech-web/goravel-workflow/models"
 )
 
-type EmpSeeder struct {
+type WorkflowEmpSeeder struct {
 }
 
 // Signature The name and signature of the seeder.
-func (s *EmpSeeder) Signature() string {
-	return "EmpSeeder"
+func (s *WorkflowEmpSeeder) Signature() string {
+	return "WorkflowEmpSeeder"
 }
 
 // Run executes the seeder logic.
-func (s *EmpSeeder) Run() error {
+func (s *WorkflowEmpSeeder) Run() error {
 	emp := models.Emp{}
 	//1-总部
 	query := facades.Orm().Query()

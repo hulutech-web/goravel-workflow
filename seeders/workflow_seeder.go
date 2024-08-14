@@ -10,15 +10,15 @@ type DatabaseSeeder struct {
 
 // Signature The name and signature of the seeder.
 func (s *DatabaseSeeder) Signature() string {
-	return "DatabaseSeeder"
+	return "WorkflowSeeder"
 }
 
 // Run executes the seeder logic.
 func (s *DatabaseSeeder) Run() error {
 	return facades.Seeder().Call([]seeder.Seeder{
-		&FlowtypeSeeder{},
-		&EmpSeeder{},
-		&DeptSeeder{},
-		&UserSeeder{},
+		&WorkflowFlowtypeSeeder{},
+		&WorkflowEmpSeeder{},
+		&WorkflowDeptSeeder{},
+		&WorkflowUserSeeder{},
 	})
 }

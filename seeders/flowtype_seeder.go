@@ -5,16 +5,16 @@ import (
 	"github.com/hulutech-web/goravel-workflow/models"
 )
 
-type FlowtypeSeeder struct {
+type WorkflowFlowtypeSeeder struct {
 }
 
 // Signature The name and signature of the seeder.
-func (s *FlowtypeSeeder) Signature() string {
-	return "FlowtypeSeeder"
+func (s *WorkflowFlowtypeSeeder) Signature() string {
+	return "WorkflowFlowtypeSeeder"
 }
 
 // Run executes the seeder logic.
-func (s *FlowtypeSeeder) Run() error {
+func (s *WorkflowFlowtypeSeeder) Run() error {
 	var flowType models.Flowtype
 	flowType.TypeName = "资金"
 	facades.Orm().Query().Model(&flowType).Create(&flowType)

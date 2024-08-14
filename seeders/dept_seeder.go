@@ -5,16 +5,16 @@ import (
 	"github.com/hulutech-web/goravel-workflow/models"
 )
 
-type DeptSeeder struct {
+type WorkflowDeptSeeder struct {
 }
 
 // Signature The name and signature of the seeder.
-func (s *DeptSeeder) Signature() string {
-	return "DeptSeeder"
+func (s *WorkflowDeptSeeder) Signature() string {
+	return "WorkflowDeptSeeder"
 }
 
 // Run executes the seeder logic.
-func (s *DeptSeeder) Run() error {
+func (s *WorkflowDeptSeeder) Run() error {
 	dept := models.Dept{}
 	//1-总部
 	query := facades.Orm().Query()
