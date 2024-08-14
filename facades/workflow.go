@@ -1,7 +1,7 @@
 package facades
 
 import (
-	workflow "github.com/hulutech-web/goravel-workflow"
+	"github.com/hulutech-web/goravel-workflow"
 	"github.com/hulutech-web/goravel-workflow/contracts"
 	"log"
 )

@@ -3,7 +3,7 @@ package models
 import (
 	"github.com/goravel/framework/contracts/database/factory"
 	"github.com/goravel/framework/database/orm"
-	"github.com/hulutech-web/goravel-workflow/database/factories"
+	"github.com/hulutech-web/goravel-workflow/factories"
 )
 
 type User struct {
