@@ -5,16 +5,16 @@ import (
 	"github.com/goravel/framework/facades"
 )
 
-type DatabaseSeeder struct {
+type WorkflowDatabaseSeeder struct {
 }
 
 // Signature The name and signature of the seeder.
-func (s *DatabaseSeeder) Signature() string {
-	return "WorkflowSeeder"
+func (s *WorkflowDatabaseSeeder) Signature() string {
+	return "WorkflowDatabaseSeeder"
 }
 
 // Run executes the seeder logic.
-func (s *DatabaseSeeder) Run() error {
+func (s *WorkflowDatabaseSeeder) Run() error {
 	return facades.Seeder().Call([]seeder.Seeder{
 		&WorkflowFlowtypeSeeder{},
 		&WorkflowEmpSeeder{},
