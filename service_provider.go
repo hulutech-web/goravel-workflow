@@ -32,11 +32,10 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 	//	数据库迁移
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
 		"migrations": app.DatabasePath("database/migrations"),
+		"seeders":    app.DatabasePath("database/seeders"),
+		"factories":  app.DatabasePath("database/factories"),
 	})
-	//命令
-	app.Commands([]console.Command{
-		commands.NewPublishWorkflow(),
-	})
+
 }
 
 func (receiver *ServiceProvider) Boot(app foundation.Application) {
