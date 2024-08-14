@@ -7,8 +7,8 @@ import (
 	"github.com/goravel/framework/contracts/database/orm"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
-	"github.com/hulutech-web/goravel-workflow/app/models"
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
+	"github.com/hulutech-web/goravel-workflow/models"
 	"github.com/spf13/cast"
 	"strings"
 )

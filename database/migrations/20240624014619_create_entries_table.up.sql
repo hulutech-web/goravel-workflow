@@ -1,0 +1,21 @@
+CREATE TABLE entries (
+  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '标题',
+   `flow_id` bigint(20) NOT NULL DEFAULT '0',
+   `emp_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '发起人',
+   `process_id` int(11) NOT NULL DEFAULT '0' COMMENT '当前步骤id',
+   `circle` smallint(6) NOT NULL DEFAULT '1' COMMENT '第几轮申请',
+   `status` int(11) NOT NULL COMMENT '当前状态 0处理中 9通过 -1驳回 -2撤销 -9草稿\n1：流程中\n9：处理完成',
+   `pid` bigint(20) NOT NULL DEFAULT '0' COMMENT '父流程',
+   `enter_process_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '进入子流程的父流程步骤id',
+   `enter_proc_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '进入子流程的进程id',
+   `child` bigint(20) NOT NULL DEFAULT '0' COMMENT '子流程 process_id',
+  created_at datetime(3) NOT NULL,
+  updated_at datetime(3) NOT NULL,
+  PRIMARY KEY (id),
+   KEY `workflow_id` (`flow_id`),
+   KEY `emp_id` (`emp_id`),
+   KEY `step_id` (`process_id`),
+  KEY idx_entries_created_at (created_at),
+  KEY idx_entries_updated_at (updated_at)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;

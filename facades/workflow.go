@@ -1,10 +1,9 @@
 package facades
 
 import (
+	workflow "github.com/hulutech-web/goravel-workflow"
+	"github.com/hulutech-web/goravel-workflow/contracts"
 	"log"
-
-	"goravel/packages/workflow"
-	"goravel/packages/workflow/contracts"
 )
 
 func Workflow() contracts.Workflow {
