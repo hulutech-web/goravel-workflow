@@ -28,7 +28,107 @@ go run . artisan vendor:publish --package=github.com/hulutech-web/goravel-workfl
 artisan vendor:publish --package=github.com/hulutech-web/goravel-workflow
 ```
 #### 2.3 执行迁移建表
+在database/seeders/database_seeder.go下的添加
+```go
+func (s *DatabaseSeeder) Run() error {
+	return facades.Seeder().Call([]seeder.Seeder{
+		&WorkflowDatabaseSeeder{},
+	})
+}
 
-### 三、使用
-#### 2.1 使用说明:自定义默认返回
+```
+#### 2.3 执行迁移
+```go
+go run . artisan migrate:refresh --seed
+```
+
+#### 2.4 检查路由重名
+如果启动项目报错，请检查路由是否有重名，并修改路由
+#### 2.5 模型映射
 发布资源后，config/workflow.go中的配置文件中有默认的关联映射，根据需要自行修改和修改
+### 二、框架路由说明
+```go
+router := app.MakeRoute()
+
+	userController := controllers.NewUserController()
+	router.Get("/users/{id}", userController.Show)
+	authController := controllers.NewAuthController()
+	router.Post("/api/auth/login", authController.AdminLogin)
+	router.Post("/api/h5/login", authController.H5Login)
+	captchaController := controllers.NewCaptchaController()
+	router.Get("/api/captcha/get", captchaController.GetCaptcha)
+	router.Post("/api/captcha/validate", captchaController.ValidateCaptcha)
+
+	facades.Route().Middleware(middleware.Jwt()).Prefix("/api").Group(func(router route.Router) {
+
+		//文件上传
+		uploadCtrl := controllers.NewUploadController()
+		router.Post("/upload", uploadCtrl.Upload)
+		userCtrl := controllers.NewUserController()
+		router.Get("/user", userCtrl.Index)
+		homeCtrl := controllers.NewHomeController()
+		router.Get("/home", homeCtrl.Index)
+
+		//	部门
+		deptCtrl := controllers.NewDeptController()
+		router.Resource("dept", deptCtrl)
+		router.Post("dept/bindmanager", deptCtrl.BindManager)
+		router.Post("dept/binddirector", deptCtrl.BindDirector)
+
+		//	员工
+		empCtrl := controllers.NewEmpController()
+		router.Resource("emp", empCtrl)
+		router.Post("emp/search", empCtrl.Search)
+		router.Get("emp/options", empCtrl.Options)
+		router.Post("emp/bind", empCtrl.BindUser)
+		//流程
+		flowCtrl := controllers.NewFlowController()
+		router.Resource("flow", flowCtrl)
+		router.Get("flow/list", flowCtrl.List)
+		router.Get("flow/create", flowCtrl.Create)
+		//流程设计
+		router.Get("flow/flowchart/{id}", flowCtrl.FlowDesign)
+		router.Post("flow/publish", flowCtrl.Publish)
+
+		//entry节点
+		entryCtrl := controllers.NewEntryController()
+		router.Get("flow/{id}/entry", entryCtrl.Create)
+		router.Post("entry", entryCtrl.Store)
+		router.Get("entry/{id}", entryCtrl.Show)
+		router.Get("entry/{id}/entrydata", entryCtrl.EntryData)
+		//流程重发
+		router.Post("entry/resend", entryCtrl.Resend)
+		//流程轨迹
+		flowlinkCtrl := controllers.NewFlowlinkController()
+		router.Post("flowlink", flowlinkCtrl.Update)
+		//模板控件
+		templateformCtrl := controllers.NewTemplateformController()
+		router.Get("template/{id}/templateform", templateformCtrl.Index)
+		router.Post("templateform", templateformCtrl.Store)
+		router.Put("templateform/{id}", templateformCtrl.Update)
+		router.Delete("templateform/{id}", templateformCtrl.Destroy)
+		router.Get("templateform/{id}", templateformCtrl.Show)
+		//模板
+		templateCtrl := controllers.NewTemplateController()
+		router.Resource("template", templateCtrl)
+
+		//	流程
+		processCtrl := controllers.NewProcessController()
+		router.Resource("process", processCtrl)
+		router.Get("process/attribute", processCtrl.Attribute)
+		router.Post("process/con", processCtrl.Condition)
+
+		//	审批流转
+		procCtrl := controllers.NewProcController()
+		router.Get("proc/{entry_id}", procCtrl.Index)
+		//同意
+		router.Post("pass", procCtrl.Pass)
+		//驳回
+		router.Post("unpass", procCtrl.UnPass)
+```
+
+### 三、前端集成
+请访问前端框架[goravel-workflow-vue](https://github.com/hulu-web/goravel-workflow-vue)下载安装扩展，并按照文档进行集成
+
+### 四、接口文档
+请访问前端框架[goravel-workflow-doc](https://github.com/hulu-web/goravel-workflow-vuepress)进行查看
