@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/validation"
+	"github.com/hulutech-web/goravel-workflow/models"
 	httpfacades "github.com/hulutech-web/http_result"
-	"goravel/app/models"
 )
 
 type TemplateController struct {

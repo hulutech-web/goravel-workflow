@@ -1,9 +1,9 @@
 package seeders
 
 import (
-	"github.com/brianvoe/gofakeit/v7"
+	"github.com/brianvoe/gofakeit/v6"
 	"github.com/goravel/framework/facades"
-	"goravel/app/models"
+	"github.com/hulutech-web/goravel-workflow/models"
 )
 
 type UserSeeder struct {

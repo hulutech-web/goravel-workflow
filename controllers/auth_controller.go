@@ -4,8 +4,8 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/validation"
-	"goravel/app/http/controllers/common"
-	"goravel/app/models"
+	"github.com/hulutech-web/goravel-workflow/controllers/common"
+	"github.com/hulutech-web/goravel-workflow/models"
 )
 
 type AuthController struct {

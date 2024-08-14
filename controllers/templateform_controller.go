@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/hulutech-web/goravel-workflow/models"
+	"github.com/hulutech-web/goravel-workflow/requests"
 	httpfacades "github.com/hulutech-web/http_result"
-	"goravel/app/http/requests"
-	"goravel/app/models"
 )
 
 type TemplateformController struct {

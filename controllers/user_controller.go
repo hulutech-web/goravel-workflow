@@ -4,9 +4,9 @@ import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/support/carbon"
-	"goravel/app/http/controllers/common"
-	"goravel/app/http/requests"
-	"goravel/app/models"
+	"github.com/hulutech-web/goravel-workflow/controllers/common"
+	"github.com/hulutech-web/goravel-workflow/models"
+	"github.com/hulutech-web/goravel-workflow/requests"
 	"strconv"
 )
 

@@ -2,7 +2,7 @@ package models
 
 import (
 	"github.com/goravel/framework/database/orm"
-	"goravel/app/models/common"
+	"github.com/hulutech-web/goravel-workflow/models/common"
 	"gorm.io/gorm"
 )
 

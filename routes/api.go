@@ -20,8 +20,6 @@ func Api(app foundation.Application) {
 	router.Get("/api/captcha/get", captchaController.GetCaptcha)
 	router.Post("/api/captcha/validate", captchaController.ValidateCaptcha)
 
-	excelController := controllers.NewExcelController()
-	facades.Route().Get("/api/excel/pdf", excelController.Pdf)
 	facades.Route().Middleware(middleware.Jwt()).Prefix("/api").Group(func(router route.Router) {
 
 		//文件上传

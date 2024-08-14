@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/hulutech-web/goravel-workflow/models"
+	workflow "github.com/hulutech-web/goravel-workflow/services/workflow"
 	httpfacades "github.com/hulutech-web/http_result"
-	"goravel/app/models"
-	"goravel/app/services/workflow"
 )
 
 type ProcController struct {

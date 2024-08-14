@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 	"github.com/goravel/framework/contracts/http"
+	"github.com/hulutech-web/goravel-workflow/services/captcha"
 	httpfacades "github.com/hulutech-web/http_result"
-	"goravel/app/services/captcha"
 )
 
 type CaptchaController struct {

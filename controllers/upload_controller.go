@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/goravel/framework/contracts/http"
+	"github.com/hulutech-web/goravel-workflow/services/Upload"
 	httpfacades "github.com/hulutech-web/http_result"
-	"goravel/app/services/Upload"
 )
 
 type UploadController struct {

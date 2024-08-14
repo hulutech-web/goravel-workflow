@@ -2,7 +2,7 @@ package seeders
 
 import (
 	"github.com/goravel/framework/facades"
-	"goravel/app/models"
+	"github.com/hulutech-web/goravel-workflow/models"
 )
 
 type DeptSeeder struct {

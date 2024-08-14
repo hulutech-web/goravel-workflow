@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
-	"goravel/app/models"
+	"github.com/hulutech-web/goravel-workflow/models"
 	"reflect"
 	"slices"
 	"strings"

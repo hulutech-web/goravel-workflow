@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/hulutech-web/goravel-workflow/models"
 	httpfacades "github.com/hulutech-web/http_result"
 	"github.com/spf13/cast"
-	"goravel/app/models"
 )
 
 type EmpController struct {

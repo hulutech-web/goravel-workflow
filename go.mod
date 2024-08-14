@@ -3,9 +3,13 @@ module github.com/hulutech-web/goravel-workflow
 go 1.22.5
 
 require (
+	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/goravel/framework v1.14.4
 	github.com/hulutech-web/http_result v1.0.17
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/spf13/cast v1.6.0
+	github.com/wenlng/go-captcha-assets v1.0.1
+	github.com/wenlng/go-captcha/v2 v2.0.0
 	gorm.io/gorm v1.25.10
 )
 
@@ -63,6 +67,7 @@ require (
 	github.com/golang-module/carbon/v2 v2.3.12 // indirect
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -98,7 +103,6 @@ require (
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
 	github.com/muesli/termenv v0.15.2 // indirect
@@ -144,6 +148,7 @@ require (
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/image v0.16.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
