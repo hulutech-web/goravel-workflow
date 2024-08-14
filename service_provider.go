@@ -26,7 +26,7 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 		})
 		return NewWorkflow(nil), nil
 	})
-	//	理由
+	//	路由
 	routes.Api(app)
 
 	//	数据库迁移
