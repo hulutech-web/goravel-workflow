@@ -31,9 +31,9 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 
 	//	数据库迁移
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
-		"database/migrations": app.DatabasePath("migrations"),
-		"database/seeders":    app.DatabasePath("seeders"),
-		"database/factories":  app.DatabasePath("factories"),
+		"migrations": app.DatabasePath("migrations"),
+		"seeders":    app.DatabasePath("seeders"),
+		"factories":  app.DatabasePath("factories"),
 	})
 
 	// 配置文件
