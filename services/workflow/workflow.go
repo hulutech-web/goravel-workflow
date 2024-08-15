@@ -10,6 +10,7 @@ import (
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
 	"github.com/spf13/cast"
+	"reflect"
 	"strings"
 	"sync"
 )
@@ -463,11 +464,28 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 // NotifySendOne 通知发起人：调用 Hookable 接口的 Passhook 方法
 func (w *Workflow) NotifySendOne(entry_id uint) error {
 	fmt.Printf("workflow.NotifySendOne :%d", entry_id)
+	value := reflect.ValueOf(w)
+	method := value.MethodByName("NotifySendOne")
+	if method.IsValid() && method.CanInterface() {
+		//调用方法
+		method.Call([]reflect.Value{reflect.ValueOf(entry_id)})
+	} else {
+		fmt.Println("方法未找到", entry_id)
+	}
 	return nil
 }
 
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	fmt.Printf("workflow.NotifyNextAuditor:%d", id)
+	value := reflect.ValueOf(w)
+	method := value.MethodByName("NotifyNextAuditor")
+	if method.IsValid() && method.CanInterface() {
+		//调用方法
+		method.Call([]reflect.Value{reflect.ValueOf(id)})
+	} else {
+		fmt.Println("方法未找到", id)
+	}
+
 	return nil
 }
 
