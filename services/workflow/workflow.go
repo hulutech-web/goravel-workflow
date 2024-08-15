@@ -30,25 +30,22 @@ var (
 func NewBaseWorkflow() *Workflow {
 	once.Do(func() {
 		baseWorkflowInstance = &Workflow{
-			hooks: make(map[string]reflect.Value), // 初始化 hooks map
+			hooks: make(map[string]reflect.Value),
 		}
-		baseWorkflowInstance.RegisterHooks() // 注册钩子方法
 	})
 	return baseWorkflowInstance
 }
 
-// RegisterHooks 注册所有的钩子方法
-func (w *Workflow) RegisterHooks() {
+// RegisterHooks 注册所有钩子方法
+func (w *Workflow) RegisterHooks(target interface{}) {
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
 
-	// 这里假设 Workflow 的子结构体包含了需要注册的钩子方法
-	value := reflect.ValueOf(w)
+	value := reflect.ValueOf(target)
 	for i := 0; i < value.NumMethod(); i++ {
-		method := value.Method(i)                 // 获取方法的 reflect.Value
-		methodName := value.Type().Method(i).Name // 获取方法名
-		w.hooks[methodName] = method              // 注册到 hooks 中
-
+		method := value.Method(i)
+		methodName := value.Type().Method(i).Name
+		w.hooks[methodName] = method
 		fmt.Printf("Registered hook: %s\n", methodName)
 	}
 }
