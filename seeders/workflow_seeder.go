@@ -19,6 +19,5 @@ func (s *WorkflowDatabaseSeeder) Run() error {
 		&WorkflowFlowtypeSeeder{},
 		&WorkflowEmpSeeder{},
 		&WorkflowDeptSeeder{},
-		&WorkflowUserSeeder{},
 	})
 }
