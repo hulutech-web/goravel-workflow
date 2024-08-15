@@ -16,21 +16,74 @@ import (
 )
 
 type Workflow struct {
+	hooks map[string]reflect.Value // 修改为 reflect.Value 来存储方法
+	mutex sync.Mutex
 }
 
-// Singleton 是 Parent 的单例实例
+// Singleton 是 Workflow 的单例实例
 var (
-	singleton *Workflow
-	mu        sync.Mutex
+	baseWorkflowInstance *Workflow
+	once                 sync.Once
 )
 
-func GetSingleton() *Workflow {
-	mu.Lock()
-	defer mu.Unlock()
-	if singleton == nil {
-		singleton = &Workflow{}
+// NewBaseWorkflow 单例工厂方法
+func NewBaseWorkflow() *Workflow {
+	once.Do(func() {
+		baseWorkflowInstance = &Workflow{
+			hooks: make(map[string]reflect.Value), // 初始化 hooks map
+		}
+		baseWorkflowInstance.RegisterHooks() // 注册钩子方法
+	})
+	return baseWorkflowInstance
+}
+
+// RegisterHooks 注册所有的钩子方法
+func (w *Workflow) RegisterHooks() {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
+	// 这里假设 Workflow 的子结构体包含了需要注册的钩子方法
+	value := reflect.ValueOf(w)
+	for i := 0; i < value.NumMethod(); i++ {
+		method := value.Method(i)                 // 获取方法的 reflect.Value
+		methodName := value.Type().Method(i).Name // 获取方法名
+		w.hooks[methodName] = method              // 注册到 hooks 中
 	}
-	return singleton
+}
+
+// NotifySendOne 调用 NotifySendOne 钩子
+func (w *Workflow) NotifySendOne(id uint) error {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
+	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
+	if hook, ok := w.hooks["NotifySendOne"]; ok {
+		// 调用 reflect.Value 的 Call 方法
+		hook.Call([]reflect.Value{reflect.ValueOf(id)})
+	}
+	return nil
+}
+
+// NotifyNextAuditor 调用 NotifyNextAuditor 钩子
+func (w *Workflow) NotifyNextAuditor(id uint) error {
+	w.mutex.Lock()
+	defer w.mutex.Unlock()
+
+	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
+	if hook, ok := w.hooks["NotifyNextAuditor"]; ok {
+		// 调用 reflect.Value 的 Call 方法
+		hook.Call([]reflect.Value{reflect.ValueOf(id)})
+	}
+	return nil
+}
+
+// 示例钩子方法
+func (w *Workflow) NotifySendOneHook(id uint) {
+	fmt.Printf("NotifySendOneHook called with id: %d\n", id)
+}
+
+func (w *Workflow) NotifyNextAuditorHook(id uint) {
+	fmt.Printf("NotifyNextAuditorHook called with id: %d\n", id)
 }
 
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
@@ -284,11 +337,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			})
 			//通知下一个审批人
 			//通知发起人，被驳回
-			single := GetSingleton()
-			//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
-			if single != nil {
-				single.NotifyNextAuditor(auditor.ID)
-			}
+			baseWorkflowInstance.NotifyNextAuditor(auditor.ID)
 		}
 		procEntry := models.Entry{}
 		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
@@ -400,11 +449,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					var notifyProc models.Proc
 					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
 				}
-				single := GetSingleton()
-				//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
-				if single != nil {
-					single.NotifySendOne(proc.EntryID)
-				}
+				baseWorkflowInstance.NotifySendOne(proc.EntryID)
 
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
@@ -457,34 +502,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 	})
 
 	tx.Commit()
-
-	return nil
-}
-
-// NotifySendOne 通知发起人：调用 Hookable 接口的 Passhook 方法
-func (w *Workflow) NotifySendOne(entry_id uint) error {
-	fmt.Printf("workflow.NotifySendOne :%d", entry_id)
-	value := reflect.ValueOf(w)
-	method := value.MethodByName("NotifySendOne")
-	if method.IsValid() && method.CanInterface() {
-		//调用方法
-		method.Call([]reflect.Value{reflect.ValueOf(entry_id)})
-	} else {
-		fmt.Println("方法未找到", entry_id)
-	}
-	return nil
-}
-
-func (w *Workflow) NotifyNextAuditor(id uint) error {
-	fmt.Printf("workflow.NotifyNextAuditor:%d", id)
-	value := reflect.ValueOf(w)
-	method := value.MethodByName("NotifyNextAuditor")
-	if method.IsValid() && method.CanInterface() {
-		//调用方法
-		method.Call([]reflect.Value{reflect.ValueOf(id)})
-	} else {
-		fmt.Println("方法未找到", id)
-	}
 
 	return nil
 }
@@ -561,11 +578,6 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
-	//通知发起人，被驳回
-	single := GetSingleton()
-	//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
-	if single != nil {
-		single.NotifySendOne(proc.Entry.EmpID)
-	}
+	baseWorkflowInstance.NotifySendOne(proc.Entry.EmpID)
 
 }

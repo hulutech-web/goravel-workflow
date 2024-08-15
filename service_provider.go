@@ -5,6 +5,7 @@ import (
 	"github.com/goravel/framework/contracts/foundation"
 	commands "github.com/hulutech-web/goravel-workflow/commands"
 	"github.com/hulutech-web/goravel-workflow/routes"
+	BaseWorkflow "github.com/hulutech-web/goravel-workflow/services/workflow"
 )
 
 const Binding = "workflow"
@@ -46,4 +47,6 @@ func (receiver *ServiceProvider) Boot(app foundation.Application) {
 	app.Commands([]console.Command{
 		commands.NewPublishWorkflow(),
 	})
+	// 初始化工作流
+	BaseWorkflow.NewBaseWorkflow()
 }
