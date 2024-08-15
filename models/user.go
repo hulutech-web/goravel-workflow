@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/goravel/framework/contracts/database/factory"
 	"github.com/goravel/framework/database/orm"
-	"github.com/goravel/framework/facades"
 	"github.com/hulutech-web/goravel-workflow/factories"
 	prochook "github.com/hulutech-web/goravel-workflow/models/prochook"
 )
@@ -25,18 +24,4 @@ type User struct {
 
 func (*User) Factory() factory.Factory {
 	return &factories.UserFactory{}
-}
-
-func (u *User) Passhook(id uint) {
-	var user User
-	facades.Orm().Query().Model(user).Where("id=?", id).First(&user)
-	facades.Log().Infof("User %s passhook called.\n", user.Name)
-}
-
-// unpasshook 方法实现了 Hookable 接口。
-// 它会自动调用 Hooker 的 unpasshook 方法，然后再调用自己的方法。
-func (u *User) Unpasshook(id uint) {
-	var user User
-	facades.Orm().Query().Model(user).Where("id=?", id).First(&user)
-	facades.Log().Infof("User %s unpasshook called.\n", user.Name)
 }
