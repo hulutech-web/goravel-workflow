@@ -69,23 +69,23 @@ func (h *Hooker) callBaseHookerMethod(methodName string, id uint) {
 	}
 }
 
-// User 结构体是外部使用者定义的结构体，它可以嵌入 Hooker。
-// 用户可以根据需要覆盖 Passhook 和 UnPasshook 方法。
-type User struct {
-	Hooker
-	Name string
-}
-
-// Passhook 方法实现了 Hookable 接口。
-// 它会自动调用 Hooker 的 Passhook 方法，然后再调用自己的方法。
-func (u *User) Passhook(id uint) {
-	u.Hooker.Passhook(id) // 调用嵌入的 Hooker 的 Passhook 方法
-	fmt.Printf("User %s Passhook called with id: %d.\n", u.Name, id)
-}
-
-// UnPasshook 方法实现了 Hookable 接口。
-// 它会自动调用 Hooker 的 UnPasshook 方法，然后再调用自己的方法。
-func (u *User) UnPasshook(id uint) {
-	u.Hooker.UnPasshook(id) // 调用嵌入的 Hooker 的 UnPasshook 方法
-	fmt.Printf("User %s UnPasshook called with id: %d.\n", u.Name, id)
-}
+//// User 结构体是外部使用者定义的结构体，它可以嵌入 Hooker。
+//// 用户可以根据需要覆盖 Passhook 和 UnPasshook 方法。
+//type User struct {
+//	Hooker
+//	Name string
+//}
+//
+//// Passhook 方法实现了 Hookable 接口。
+//// 它会自动调用 Hooker 的 Passhook 方法，然后再调用自己的方法。
+//func (u *User) Passhook(id uint) {
+//	u.Hooker.Passhook(id) // 调用嵌入的 Hooker 的 Passhook 方法
+//	fmt.Printf("User %s Passhook called with id: %d.\n", u.Name, id)
+//}
+//
+//// UnPasshook 方法实现了 Hookable 接口。
+//// 它会自动调用 Hooker 的 UnPasshook 方法，然后再调用自己的方法。
+//func (u *User) UnPasshook(id uint) {
+//	u.Hooker.UnPasshook(id) // 调用嵌入的 Hooker 的 UnPasshook 方法
+//	fmt.Printf("User %s UnPasshook called with id: %d.\n", u.Name, id)
+//}
