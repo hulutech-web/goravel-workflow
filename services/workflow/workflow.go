@@ -59,9 +59,6 @@ func (w *Workflow) NotifySendOne(id uint) error {
 
 	// 在调用钩子前解锁
 	if hook, ok := w.hooks["NotifySendOneHook"]; ok {
-		w.mutex.Unlock()     // 解锁
-		defer w.mutex.Lock() // 在函数结束时重新锁定
-
 		// 检查方法签名
 		methodType := hook.Type()
 		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
@@ -83,8 +80,7 @@ func (w *Workflow) NotifyNextAuditor(id uint) error {
 
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 	if hook, ok := w.hooks["NotifyNextAuditor"]; ok {
-		w.mutex.Lock()
-		defer w.mutex.Unlock()
+
 		// 检查方法签名
 		methodType := hook.Type()
 		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
