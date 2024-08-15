@@ -48,6 +48,8 @@ func (w *Workflow) RegisterHooks() {
 		method := value.Method(i)                 // 获取方法的 reflect.Value
 		methodName := value.Type().Method(i).Name // 获取方法名
 		w.hooks[methodName] = method              // 注册到 hooks 中
+
+		fmt.Printf("Registered hook: %s\n", methodName)
 	}
 }
 
@@ -60,6 +62,8 @@ func (w *Workflow) NotifySendOne(id uint) error {
 	if hook, ok := w.hooks["NotifySendOne"]; ok {
 		// 调用 reflect.Value 的 Call 方法
 		hook.Call([]reflect.Value{reflect.ValueOf(id)})
+	} else {
+		return errors.New("hook not found")
 	}
 	return nil
 }
@@ -71,8 +75,17 @@ func (w *Workflow) NotifyNextAuditor(id uint) error {
 
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 	if hook, ok := w.hooks["NotifyNextAuditor"]; ok {
-		// 调用 reflect.Value 的 Call 方法
-		hook.Call([]reflect.Value{reflect.ValueOf(id)})
+		// 检查方法签名
+		methodType := hook.Type()
+		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
+			fmt.Println("Calling NotifyNextAuditorHook...")
+			hook.Call([]reflect.Value{reflect.ValueOf(id)})
+			fmt.Println("NotifyNextAuditorHook completed.")
+		} else {
+			fmt.Println("Method signature mismatch or invalid hook.")
+		}
+	} else {
+		fmt.Println("Hook not found.")
 	}
 	return nil
 }
