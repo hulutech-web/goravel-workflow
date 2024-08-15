@@ -355,7 +355,7 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 
 								var notifyProc models.Proc
 								tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
-								w.Notify(notifyProc)
+								w.NotifySendOne(notifyProc)
 							} else {
 								w.goToProcess(*proc.Entry.ParentEntry, parentFlowlink.NextProcessID)
 								proc.Entry.ParentEntry.ProcessID = cast.ToUint(parentFlowlink.NextProcessID)
@@ -430,6 +430,22 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 
 	tx.Commit()
 
+	return nil
+}
+
+// 通知发起人
+func (w *Workflow) NotifySendOne(proc models.Proc) error {
+	entry_id := proc.EntryID
+
+	var entry models.Entry
+	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entry_id).First(&entry)
+	user_id := entry.EmpID
+	var user models.User
+	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
+	if user.ID != 0 {
+		//调用这个hook方法
+		user.Passhook(user.ID)
+	}
 	return nil
 }
 
@@ -517,5 +533,7 @@ func (w *Workflow) UnPass(proc_id int, user models.User, content string) {
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
+	//通知发起人，被驳回
+	w.NotifySendOne(todoProc)
 
 }
