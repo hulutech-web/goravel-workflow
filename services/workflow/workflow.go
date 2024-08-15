@@ -9,25 +9,27 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
-	"github.com/hulutech-web/goravel-workflow/models/prochook"
 	"github.com/spf13/cast"
-	"reflect"
 	"strings"
+	"sync"
 )
 
 type Workflow struct {
-	hook prochook.Hookable // 用于存储实现了 Hookable 接口的实例
 }
 
-// SetHookable 用于设置 Workflow 中的 Hookable 实例
-func (w *Workflow) SetHookable(hook prochook.Hookable) {
-	w.hook = hook
-}
+// Singleton 是 Parent 的单例实例
+var (
+	singleton *Workflow
+	mu        sync.Mutex
+)
 
-func NewWorkflow(hook prochook.Hookable) *Workflow {
-	return &Workflow{
-		hook: hook,
+func GetSingleton() *Workflow {
+	mu.Lock()
+	defer mu.Unlock()
+	if singleton == nil {
+		singleton = &Workflow{}
 	}
+	return singleton
 }
 
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
@@ -369,7 +371,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 
 								var notifyProc models.Proc
 								tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
-								w.NotifySendOne(notifyProc)
 							} else {
 								w.goToProcess(*proc.Entry.ParentEntry, parentFlowlink.NextProcessID)
 								proc.Entry.ParentEntry.ProcessID = cast.ToUint(parentFlowlink.NextProcessID)
@@ -392,8 +393,13 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				} else {
 					var notifyProc models.Proc
 					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
-					w.NotifySendOne(notifyProc)
 				}
+				single := GetSingleton()
+				//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
+				if single != nil {
+					single.NotifySendOne(proc.EntryID)
+				}
+
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
 				auditors := []models.Emp{}
@@ -450,37 +456,14 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 }
 
 // NotifySendOne 通知发起人：调用 Hookable 接口的 Passhook 方法
-func (w *Workflow) NotifySendOne(proc models.Proc) error {
-	entryID := proc.EntryID
-	var entry models.Entry
-	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entryID).First(&entry)
-	var emp models.Emp
-	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", proc.EmpID).First(&emp)
-	w.SetHookable(&emp)
-	if entry.EmpID != 0 && w.hook != nil {
-		// 调用传入的 Hookable 实现的 Passhook 方法
-		callHookMethod(w.hook, "Passhook", entryID)
-	}
+func (w *Workflow) NotifySendOne(entry_id uint) error {
+	fmt.Sprintf("workflow.NotifySendOne :%d", entry_id)
 	return nil
 }
 
 func (w *Workflow) NotifyNextAuditor(id uint) error {
-	var emp models.Emp
-	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", id).First(&emp)
-	w.SetHookable(&emp)
-	if emp.ID != 0 && w.hook != nil {
-		callHookMethod(w.hook, "Passhook", id)
-	}
+	fmt.Sprintf("workflow.NotifyNextAuditor:%d", id)
 	return nil
-}
-
-// callHookMethod 使用反射调用 Hookable 实现的指定方法
-func callHookMethod(hook prochook.Hookable, methodName string, id uint) {
-	v := reflect.ValueOf(hook)
-	method := v.MethodByName(methodName)
-	if method.IsValid() && method.Kind() == reflect.Func {
-		method.Call([]reflect.Value{reflect.ValueOf(id)})
-	}
 }
 
 func (w *Workflow) goToProcess(entry models.Entry, processID int) error {
@@ -556,6 +539,10 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
 	//通知发起人，被驳回
-	w.NotifySendOne(todoProc)
+	single := GetSingleton()
+	//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
+	if single != nil {
+		single.NotifySendOne(proc.Entry.EmpID)
+	}
 
 }
