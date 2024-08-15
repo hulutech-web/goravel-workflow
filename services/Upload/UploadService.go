@@ -30,7 +30,7 @@ func (*UploadService) Upload(ctx http.Context, file filesystem.File) (*models.At
 	putFile, err := facades.Storage().PutFile(yearMonth, file)
 
 	//保存文件，返回保存路径
-	user := models.User{}
+	user := models.Emp{}
 	if err1 := facades.Auth(ctx).User(&user); err1 != nil {
 		att := models.Attachment{
 			Name: name,

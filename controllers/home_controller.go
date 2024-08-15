@@ -20,7 +20,7 @@ func NewHomeController() *HomeController {
 
 func (r *HomeController) Index(ctx http.Context) http.Response {
 	entries := []models.Entry{}
-	user := models.User{}
+	user := models.Emp{}
 	facades.Auth(ctx).User(&user)
 	emp := models.Emp{}
 	facades.Orm().Query().Model(&models.Emp{}).Where("user_id=?", user.ID).First(&emp)

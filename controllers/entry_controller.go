@@ -60,7 +60,7 @@ func (r *EntryController) EntryData(ctx http.Context) http.Response {
 func (r *EntryController) Store(ctx http.Context) http.Response {
 	//添加发起节点
 	flow_id := ctx.Request().InputInt("flow_id")
-	var user models.User
+	var user models.Emp
 	facades.Auth(ctx).User(&user)
 
 	flowlink := models.Flowlink{}
