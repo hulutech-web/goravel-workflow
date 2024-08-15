@@ -378,7 +378,7 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 				} else {
 					var notifyProc models.Proc
 					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
-					w.Notify(notifyProc)
+					w.NotifySendOne(notifyProc)
 				}
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
@@ -440,18 +440,6 @@ func (w *Workflow) NotifySendOne(proc models.Proc) error {
 	var entry models.Entry
 	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entry_id).First(&entry)
 	user_id := entry.EmpID
-	var user models.User
-	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
-	if user.ID != 0 {
-		//调用这个hook方法
-		user.Passhook(user.ID)
-	}
-	return nil
-}
-
-// 发送结束通知
-func (w *Workflow) Notify(proc models.Proc) error {
-	user_id := proc.EmpID
 	var user models.User
 	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
 	if user.ID != 0 {
