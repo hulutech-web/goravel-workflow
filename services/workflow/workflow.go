@@ -9,11 +9,19 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
+	"github.com/hulutech-web/goravel-workflow/models/prochook"
 	"github.com/spf13/cast"
+	"reflect"
 	"strings"
 )
 
 type Workflow struct {
+	hook prochook.Hookable // 用于存储实现了 Hookable 接口的实例
+}
+
+// SetHookable 用于设置 Workflow 中的 Hookable 实例
+func (w *Workflow) SetHookable(hook prochook.Hookable) {
+	w.hook = hook
 }
 
 func NewWorkflow() *Workflow {
@@ -172,7 +180,7 @@ func uniqueSlice(slice []int) []int {
 }
 
 // 流转
-func (w *Workflow) Transfer(process_id int, user models.User, content string) error {
+func (w *Workflow) Transfer(process_id int, user models.Emp, content string) error {
 	tx, _ := facades.Orm().Query().Begin()
 	var emp models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).With("Dept").Where("user_id=?", user.ID).First(&emp)
@@ -268,6 +276,8 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 				IsRead:      0,
 				Concurrence: curr_time,
 			})
+			//通知下一个审批人
+			w.NotifyNextAuditor(auditor.ID)
 		}
 		procEntry := models.Entry{}
 		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
@@ -403,6 +413,8 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 						Status:      0,
 						IsRead:      0,
 					})
+					//通知下一个审批人
+					w.NotifyNextAuditor(auditor.ID)
 				}
 				tx.Model(&models.Entry{}).Where("id=?", proc.Entry.ID).Update("process_id", cast.ToUint(fklink.NextProcessID))
 				//	判断是否存在父进程
@@ -434,20 +446,34 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 	return nil
 }
 
-// 通知发起人
+// NotifySendOne 通知发起人：调用 Hookable 接口的 Passhook 方法
 func (w *Workflow) NotifySendOne(proc models.Proc) error {
-	entry_id := proc.EntryID
-
+	entryID := proc.EntryID
 	var entry models.Entry
-	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entry_id).First(&entry)
-	user_id := entry.EmpID
-	var user models.User
-	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
-	if user.ID != 0 {
-		//调用这个hook方法
-		user.Passhook(user.ID)
+	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entryID).First(&entry)
+	if entry.EmpID != 0 && w.hook != nil {
+		// 调用传入的 Hookable 实现的 Passhook 方法
+		callHookMethod(w.hook, "Passhook", entryID)
 	}
 	return nil
+}
+
+func (w *Workflow) NotifyNextAuditor(id uint) error {
+	var emp models.Emp
+	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", id).First(&emp)
+	if emp.ID != 0 && w.hook != nil {
+		callHookMethod(w.hook, "Passhook", id)
+	}
+	return nil
+}
+
+// callHookMethod 使用反射调用 Hookable 实现的指定方法
+func callHookMethod(hook prochook.Hookable, methodName string, id uint) {
+	v := reflect.ValueOf(hook)
+	method := v.MethodByName(methodName)
+	if method.IsValid() && method.Kind() == reflect.Func {
+		method.Call([]reflect.Value{reflect.ValueOf(id)})
+	}
 }
 
 func (w *Workflow) goToProcess(entry models.Entry, processID int) error {
@@ -488,11 +514,11 @@ func (w *Workflow) goToProcess(entry models.Entry, processID int) error {
 	return nil
 }
 
-func (w *Workflow) Pass(process_id int, user models.User, content string) error {
+func (w *Workflow) Pass(process_id int, user models.Emp, content string) error {
 	return w.Transfer(process_id, user, content)
 }
 
-func (w *Workflow) UnPass(proc_id int, user models.User, content string) {
+func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 	var proc models.Proc
 	query := facades.Orm().Query()
 	var emp models.Emp

@@ -11,8 +11,6 @@ import (
 func Api(app foundation.Application) {
 	router := app.MakeRoute()
 
-	userController := controllers.NewUserController()
-	router.Get("/users/{id}", userController.Show)
 	authController := controllers.NewAuthController()
 	router.Post("/api/auth/login", authController.AdminLogin)
 	router.Post("/api/h5/login", authController.H5Login)
@@ -25,8 +23,7 @@ func Api(app foundation.Application) {
 		//文件上传
 		uploadCtrl := controllers.NewUploadController()
 		router.Post("/upload", uploadCtrl.Upload)
-		userCtrl := controllers.NewUserController()
-		router.Get("/user", userCtrl.Index)
+
 		homeCtrl := controllers.NewHomeController()
 		router.Get("/home", homeCtrl.Index)
 

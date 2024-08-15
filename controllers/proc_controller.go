@@ -31,7 +31,7 @@ func (r *ProcController) Children(ctx http.Context) http.Response {
 }
 
 func (r *ProcController) Pass(ctx http.Context) http.Response {
-	var user models.User
+	var user models.Emp
 	facades.Auth(ctx).User(&user)
 	process_id := ctx.Request().InputInt("process_id")
 	content := ctx.Request().Input("content")
@@ -43,10 +43,10 @@ func (r *ProcController) Pass(ctx http.Context) http.Response {
 }
 
 func (r *ProcController) UnPass(ctx http.Context) http.Response {
-	var user models.User
+	var user models.Emp
 	facades.Auth(ctx).User(&user)
-	withUser := models.User{}
-	facades.Orm().Query().Model(&models.User{}).Where("id=?", user.ID).With("Dept").First(&withUser)
+	withUser := models.Emp{}
+	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", user.ID).With("Dept").First(&withUser)
 	proc_id := ctx.Request().InputInt("proc_id")
 	content := ctx.Request().Input("content")
 
