@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/goravel/framework/contracts/database/factory"
 	"github.com/goravel/framework/database/orm"
+	"github.com/goravel/framework/facades"
 	"github.com/hulutech-web/goravel-workflow/factories"
 	prochook "github.com/hulutech-web/goravel-workflow/models/prochook"
 )
@@ -29,10 +30,12 @@ func (*User) Factory() factory.Factory {
 
 func (u *User) Passhook() {
 	fmt.Printf("User %s passhook called.\n", u.Name)
+	facades.Log().Infof("User %s passhook called.\n")
 }
 
 // unpasshook 方法实现了 Hookable 接口。
 // 它会自动调用 Hooker 的 unpasshook 方法，然后再调用自己的方法。
 func (u *User) Unpasshook() {
 	fmt.Printf("User %s unpasshook called.\n", u.Name)
+	facades.Log().Infof("User %s unpasshook called.\n")
 }

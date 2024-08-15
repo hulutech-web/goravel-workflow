@@ -444,6 +444,7 @@ func (w *Workflow) Notify(proc models.Proc) error {
 	}
 	return nil
 }
+
 func (w *Workflow) goToProcess(entry models.Entry, processID int) error {
 	auditor_ids := w.GetProcessAuditorIds(entry, processID)
 	auditors := []models.Emp{}
