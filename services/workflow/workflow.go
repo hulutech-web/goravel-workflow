@@ -440,7 +440,7 @@ func (w *Workflow) Notify(proc models.Proc) error {
 	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
 	if user.ID != 0 {
 		//调用这个hook方法
-		user.Passhook()
+		user.Passhook(user.ID)
 	}
 	return nil
 }
