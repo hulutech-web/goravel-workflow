@@ -21,7 +21,6 @@ type EntryController struct {
 
 func NewEntryController() *EntryController {
 	return &EntryController{
-		workflow:         workflow.NewWorkflow(),
 		dynamicValidator: common.NewDynamicValidator(),
 	}
 }
@@ -105,6 +104,9 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 		First(&withEntry)
 	//进程初始化
 	//第一步看是否指定审核人
+	var emp models.Emp
+	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", withEntry.EmpID).First(&emp)
+	r.workflow.SetHookable(emp)
 	err = r.workflow.SetFirstProcessAuditor(withEntry, withFlowlink)
 
 	//向entrydata中插入数据
@@ -187,6 +189,10 @@ func (r *EntryController) Resend(ctx http.Context) http.Response {
 	newEntry := models.Entry{}
 	query.Model(&models.Entry{}).Where("id=?", entry.ID).With("Flow").With("Emp.Dept").With("Procs").With("EnterProcess").First(&newEntry)
 
+	//注入emp
+	var emp models.Emp
+	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", newEntry.EmpID).First(&emp)
+	r.workflow.SetHookable(emp)
 	err := r.workflow.SetFirstProcessAuditor(newEntry, withFlowlink)
 	if err != nil {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "系统错误，请检查", "")

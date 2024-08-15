@@ -24,9 +24,12 @@ func (w *Workflow) SetHookable(hook prochook.Hookable) {
 	w.hook = hook
 }
 
-func NewWorkflow() *Workflow {
-	return &Workflow{}
+func NewWorkflow(hook prochook.Hookable) *Workflow {
+	return &Workflow{
+		hook: hook,
+	}
 }
+
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
 	return facades.Orm().Transaction(func(tx orm.Transaction) error {
 		var myFlowlink models.Flowlink
