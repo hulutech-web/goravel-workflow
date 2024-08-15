@@ -55,26 +55,36 @@ func (w *Workflow) RegisterHooks() {
 
 // NotifySendOne 调用 NotifySendOne 钩子
 func (w *Workflow) NotifySendOne(id uint) error {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
-	if hook, ok := w.hooks["NotifySendOne"]; ok {
-		// 调用 reflect.Value 的 Call 方法
-		hook.Call([]reflect.Value{reflect.ValueOf(id)})
+
+	// 在调用钩子前解锁
+	if hook, ok := w.hooks["NotifySendOneHook"]; ok {
+		w.mutex.Unlock()     // 解锁
+		defer w.mutex.Lock() // 在函数结束时重新锁定
+
+		// 检查方法签名
+		methodType := hook.Type()
+		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
+			fmt.Println("Calling NotifySendOneHook...")
+			hook.Call([]reflect.Value{reflect.ValueOf(id)})
+			fmt.Println("NotifySendOneHook completed.")
+		} else {
+			fmt.Println("Method signature mismatch or invalid hook.")
+		}
 	} else {
-		return errors.New("hook not found")
+		fmt.Println("Hook not found.")
 	}
+
 	return nil
 }
 
 // NotifyNextAuditor 调用 NotifyNextAuditor 钩子
 func (w *Workflow) NotifyNextAuditor(id uint) error {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
 
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 	if hook, ok := w.hooks["NotifyNextAuditor"]; ok {
+		w.mutex.Lock()
+		defer w.mutex.Unlock()
 		// 检查方法签名
 		methodType := hook.Type()
 		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
