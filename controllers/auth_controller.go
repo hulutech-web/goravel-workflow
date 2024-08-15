@@ -22,13 +22,13 @@ func (r *AuthController) AdminLogin(ctx http.Context) http.Response {
 	password := user.Password
 	//验证
 	validator, _ := facades.Validation().Make(map[string]any{
-		"mobile":   ctx.Request().Input("mobile", ""),
+		"workno":   ctx.Request().Input("workno", ""),
 		"password": ctx.Request().Input("password", ""),
 	}, map[string]string{
-		"mobile":   "required",
+		"workno":   "required",
 		"password": "required",
 	}, validation.Messages(map[string]string{
-		"mobile.required":   "名称不能为空",
+		"workno.required":   "工号不能为空",
 		"password.required": "密码不能为空",
 	}))
 	if validator.Fails() {
