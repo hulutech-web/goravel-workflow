@@ -456,7 +456,7 @@ func (w *Workflow) NotifySendOne(proc models.Proc) error {
 	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", entryID).First(&entry)
 	var emp models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", proc.EmpID).First(&emp)
-	w.SetHookable(emp)
+	w.SetHookable(&emp)
 	if entry.EmpID != 0 && w.hook != nil {
 		// 调用传入的 Hookable 实现的 Passhook 方法
 		callHookMethod(w.hook, "Passhook", entryID)
@@ -467,7 +467,7 @@ func (w *Workflow) NotifySendOne(proc models.Proc) error {
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	var emp models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", id).First(&emp)
-	w.SetHookable(emp)
+	w.SetHookable(&emp)
 	if emp.ID != 0 && w.hook != nil {
 		callHookMethod(w.hook, "Passhook", id)
 	}
