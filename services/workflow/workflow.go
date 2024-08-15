@@ -435,6 +435,13 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 
 // 发送结束通知
 func (w *Workflow) Notify(proc models.Proc) error {
+	user_id := proc.EmpID
+	var user models.User
+	facades.Orm().Query().Model(&models.User{}).Where("id=?", user_id).First(&user)
+	if user.ID != 0 {
+		//调用这个hook方法
+		user.Passhook()
+	}
 	return nil
 }
 func (w *Workflow) goToProcess(entry models.Entry, processID int) error {
