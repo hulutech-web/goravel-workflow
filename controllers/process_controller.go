@@ -44,7 +44,7 @@ func (r *ProcessController) Store(ctx http.Context) http.Response {
 	process.ProcessName = "新建流程"
 	process.StyleWidth = 200
 	process.StyleHeight = 48
-	process.Style = fmt.Sprintf("width:200px;height:48px;line-height:30px;color:#78a300;left:%s;top:%s;", left, top)
+	process.Style = fmt.Sprintf("width:200px;height:48px;line-height:30px;color:#ffc400;left:%s;top:%s;", left, top)
 	process.PositionLeft = left
 	process.PositionTop = top
 	if err := tx.Model(&models.Process{}).Create(&process); err != nil {

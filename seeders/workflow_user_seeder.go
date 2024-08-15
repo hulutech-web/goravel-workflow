@@ -16,7 +16,7 @@ func (s *WorkflowUserSeeder) Signature() string {
 
 // Run executes the seeder logic.
 func (s *WorkflowUserSeeder) Run() error {
-	emps := []models.Emp{}
+	var emps []models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).Find(&emps)
 	for _, emp := range emps {
 		var user models.User

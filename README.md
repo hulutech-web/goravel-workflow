@@ -1,4 +1,5 @@
-# workflow
+# goravel-workflow
+使用文档[文档](https://hulutech-web.github.io/goravel-workflow.github.io/)
 ### 一、安装
 ```go
 go get  github.com/hulutech-web/goravel-workflow
