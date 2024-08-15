@@ -225,7 +225,7 @@ func (w *Workflow) Transfer(process_id int, user models.User, content string) er
 							conditionSql += fmt.Sprintf(" `field_value` %s %s %s", condition.Operator, condition.Value, condition.Extra)
 						}
 					}
-					conditionSql = fmt.Sprintf("SELECT count(*) as number FROM entrydatas WHERE entry_id=%d and flow_id=%d (%s) and (`field_name`='%s')",
+					conditionSql = fmt.Sprintf("SELECT count(*) as number FROM entrydatas WHERE entry_id=%d and flow_id=%d and (%s) and (`field_name`='%s')",
 						proc.EntryID, proc.FlowID, conditionSql, field)
 					//还需要条件entry_id和flow_id
 					err := facades.Orm().Query().Raw(conditionSql).Scan(&resultCount)
