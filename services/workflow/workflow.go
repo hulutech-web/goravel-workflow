@@ -132,7 +132,7 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 		}
 		//	2、指定部门
 		concurrent_dept_flowlink := models.Flowlink{}
-		query.Model(&models.Flowlink{}).Where("type = ?", "Emp").Where("process_id=?", next_process_id).
+		query.Model(&models.Flowlink{}).Where("type = ?", "Dept").Where("process_id=?", next_process_id).
 			First(&concurrent_dept_flowlink)
 
 		if concurrent_dept_flowlink.ID > 0 {
