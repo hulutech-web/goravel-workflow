@@ -18,11 +18,11 @@ type Emp struct {
 }
 
 // Passhook 方法的默认实现。
-func (e Emp) Passhook() {
+func (e *Emp) Passhook() {
 	fmt.Println("Emp Passhook called.")
 }
 
 // UnPasshook 方法的默认实现。
-func (e Emp) UnPasshook() {
+func (e *Emp) UnPasshook() {
 	fmt.Println("Emp UnPasshook called.")
 }
