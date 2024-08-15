@@ -1,11 +1,11 @@
 package workflow
 
 import (
+	"fmt"
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/foundation"
 	commands "github.com/hulutech-web/goravel-workflow/commands"
 	"github.com/hulutech-web/goravel-workflow/routes"
-	BaseWorkflow "github.com/hulutech-web/goravel-workflow/services/workflow"
 )
 
 const Binding = "workflow"
@@ -41,6 +41,8 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
 		"config/workflow.go": app.ConfigPath("workflow.go"),
 	})
+	fmt.Println("============Register2================")
+
 }
 
 func (receiver *ServiceProvider) Boot(app foundation.Application) {
@@ -48,5 +50,7 @@ func (receiver *ServiceProvider) Boot(app foundation.Application) {
 		commands.NewPublishWorkflow(),
 	})
 	// 初始化工作流
-	BaseWorkflow.NewBaseWorkflow()
+	//BaseWorkflow.NewBaseWorkflow()
+	fmt.Println("============Boot2================")
+
 }
