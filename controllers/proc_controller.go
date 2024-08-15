@@ -14,9 +14,7 @@ type ProcController struct {
 }
 
 func NewProcController() *ProcController {
-	return &ProcController{
-		workflow: workflow.NewWorkflow(),
-	}
+	return &ProcController{}
 }
 
 func (r *ProcController) Index(ctx http.Context) http.Response {
