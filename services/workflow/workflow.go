@@ -282,7 +282,12 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				Concurrence: curr_time,
 			})
 			//通知下一个审批人
-			w.NotifyNextAuditor(auditor.ID)
+			//通知发起人，被驳回
+			single := GetSingleton()
+			//如果存在继承workflow的子结构，则执行子结构中的NotifySendOne方法
+			if single != nil {
+				single.NotifyNextAuditor(auditor.ID)
+			}
 		}
 		procEntry := models.Entry{}
 		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
@@ -457,12 +462,12 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 
 // NotifySendOne 通知发起人：调用 Hookable 接口的 Passhook 方法
 func (w *Workflow) NotifySendOne(entry_id uint) error {
-	fmt.Sprintf("workflow.NotifySendOne :%d", entry_id)
+	fmt.Printf("workflow.NotifySendOne :%d", entry_id)
 	return nil
 }
 
 func (w *Workflow) NotifyNextAuditor(id uint) error {
-	fmt.Sprintf("workflow.NotifyNextAuditor:%d", id)
+	fmt.Printf("workflow.NotifyNextAuditor:%d", id)
 	return nil
 }
 
