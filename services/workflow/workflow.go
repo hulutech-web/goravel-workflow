@@ -347,7 +347,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			})
 			//通知下一个审批人
 			//通知发起人，被驳回
-			baseWorkflowInstance.NotifyNextAuditor(auditor.ID)
+			w.NotifyNextAuditor(auditor.ID)
 		}
 		procEntry := models.Entry{}
 		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
@@ -592,6 +592,6 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
-	baseWorkflowInstance.NotifySendOne(proc.Entry.EmpID)
+	w.NotifySendOne(proc.Entry.EmpID)
 
 }
