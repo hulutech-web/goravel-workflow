@@ -36,18 +36,12 @@ func NewBaseWorkflow() *Workflow {
 	return baseWorkflowInstance
 }
 
-// RegisterHooks 注册所有钩子方法
-func (w *Workflow) RegisterHooks(target interface{}) {
+// RegisterHook 注册钩子方法
+func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
-
-	value := reflect.ValueOf(target)
-	for i := 0; i < value.NumMethod(); i++ {
-		method := value.Method(i)
-		methodName := value.Type().Method(i).Name
-		w.hooks[methodName] = method
-		fmt.Printf("Registered hook: %s\n", methodName)
-	}
+	w.hooks[name] = method
+	fmt.Printf("Registered hook: %s\n", name)
 }
 
 // NotifySendOne 调用 NotifySendOne 钩子
@@ -91,15 +85,6 @@ func (w *Workflow) NotifyNextAuditor(id uint) error {
 		fmt.Println("Hook not found.")
 	}
 	return nil
-}
-
-// 示例钩子方法
-func (w *Workflow) NotifySendOneHook(id uint) {
-	fmt.Printf("NotifySendOneHook called with id: %d\n", id)
-}
-
-func (w *Workflow) NotifyNextAuditorHook(id uint) {
-	fmt.Printf("NotifyNextAuditorHook called with id: %d\n", id)
 }
 
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
