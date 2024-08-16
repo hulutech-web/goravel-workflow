@@ -38,15 +38,61 @@ func (s *DatabaseSeeder) Run() error {
 }
 
 ```
-#### 2.3 执行迁移
+#### 2.4 执行迁移
 ```go
 go run . artisan migrate:refresh --seed
 ```
 
-#### 2.4 检查路由重名
+#### 2.5 检查路由重名
 如果启动项目报错，请检查路由是否有重名，并修改路由
-#### 2.5 模型映射
+#### 2.6 模型映射
 发布资源后，config/workflow.go中的配置文件中有默认的关联映射，根据需要自行修改和修改
+### 三、实现Hook接口（可选）
+用户自定义User结构中注入流程框架，并实现框架中的Hook接口
+```go
+type User struct {
+	orm.Model
+	Name     string `gorm:"column:name;type:varchar(255);not null" form:"name" json:"name"`
+	WorkNo   string `gorm:"column:workno;not null;unique_index:users_workno_unique" json:"workno" form:"workno"`
+	Password string `gorm:"column:password;type:varchar(255);not null" form:"password" json:"password"`
+	...
+	Workflow *Workflow
+	orm.SoftDeletes
+}
+```
+实现接口
+```go
+// 通知发起人，在被驳回时调用，或者整个流程结束时调用。
+func (u *User) NotifySendOne(id uint) error {
+
+	fmt.Printf("custom ======User %d unpasshook called.\n", id)
+	return nil
+}
+
+// 通知下一个审批人，当当前环节的审批人通过时，触发。
+func (u *User) NotifyNextAuditor(id uint) error {
+	fmt.Printf("custom ======User %d passhook called.\n", id)
+	return nil
+}
+
+```
+
+### 实例化workflow
+框架提供了2个``hooks``，供开发者自行实现逻辑，可以发送邮件通知，短信通知等
+``app/providers/app_services_provider.go``
+实例化workflow，并注入服务
+```go
+func (receiver *AppServiceProvider) Boot(app foundation.Application) {
+	wf := workflow.NewBaseWorkflow()
+	// 注册子级的方法到工作流中
+	user := &models.User{Workflow: wf}
+	wf.RegisterHook("NotifySendOneHook", reflect.ValueOf(user.NotifySendOne))
+	wf.RegisterHook("NotifyNextAuditorHook", reflect.ValueOf(user.NotifyNextAuditor))
+}
+
+回调参数将在User结构中的NotifySendOne和NotifyNextAuditor方法中执行后续操作，由开发者自行实现
+
+```
 ### 二、框架路由说明
 ```go
 router := app.MakeRoute()
