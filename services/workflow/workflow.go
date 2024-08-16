@@ -66,8 +66,8 @@ func (w *Workflow) NotifyNextAuditor(id uint) error {
 func (w *Workflow) invokeHooks(hookName string, id uint) {
 	if hooks, ok := w.hooks[hookName]; ok {
 		for _, hook := range hooks {
-			w.mutex.Lock()
-			defer w.mutex.Unlock()
+			//w.mutex.Lock()
+			//defer w.mutex.Unlock()
 			// 检查方法签名
 			methodType := hook.Type()
 			if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
