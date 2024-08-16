@@ -38,14 +38,24 @@ func NewBaseWorkflow() *Workflow {
 
 // RegisterHook 注册钩子方法
 func (w *Workflow) RegisterHook(name string, method reflect.Value) {
+	if w.hooks == nil {
+		fmt.Println("Hooks map is nil!")
+		w.hooks = make(map[string][]reflect.Value)
+	}
+
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
+
 	w.hooks[name] = append(w.hooks[name], method)
-	fmt.Printf("Registered hook: %s\n", name)
+	fmt.Printf("Registered hook: %s with method: %v\n", name, method)
 }
 
 // NotifySendOne 调用 NotifySendOne 钩子
 func (w *Workflow) NotifySendOne(id uint) error {
+	if w == nil {
+		fmt.Println("Workflow instance is nil in NotifySendOne!")
+		return fmt.Errorf("workflow instance is nil")
+	}
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
 
 	w.invokeHooks("NotifySendOneHook", id)
@@ -55,6 +65,10 @@ func (w *Workflow) NotifySendOne(id uint) error {
 
 // NotifyNextAuditor 调用 NotifyNextAuditor 钩子
 func (w *Workflow) NotifyNextAuditor(id uint) error {
+	if w == nil {
+		fmt.Println("Workflow instance is nil in NotifyNextAuditor!")
+		return fmt.Errorf("workflow instance is nil")
+	}
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 
 	w.invokeHooks("NotifyNextAuditorHook", id)
