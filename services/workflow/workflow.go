@@ -48,22 +48,20 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 func (w *Workflow) NotifyStartThis(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
 
-	w.invokeHooks("NotifyStartThis", id)
+	return w.invokeHooks("NotifyStartThis", id)
 
-	return nil
 }
 
 // NotifyNextAuditor 调用 NotifyNextAuditor 钩子
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 
-	w.invokeHooks("NotifyNextAuditor", id)
+	return w.invokeHooks("NotifyNextAuditor", id)
 
-	return nil
 }
 
 // invokeHooks 用于依次调用所有注册的钩子方法
-func (w *Workflow) invokeHooks(hookName string, id uint) {
+func (w *Workflow) invokeHooks(hookName string, id uint) error {
 	if hooks, ok := w.hooks[hookName]; ok {
 		for _, hook := range hooks {
 			//w.mutex.Lock()
@@ -75,13 +73,15 @@ func (w *Workflow) invokeHooks(hookName string, id uint) {
 				hook.Call([]reflect.Value{reflect.ValueOf(id)})
 				fmt.Printf("%s completed.\n", hookName)
 			} else {
-				fmt.Printf("Method signature mismatch or invalid hook for %s.\n", hookName)
+				return errors.New("Method signature mismatch or invalid hook for " + hookName)
 			}
 		}
 	} else {
-		fmt.Printf("Hook %s not found.\n", hookName)
+		return errors.New("Hook " + hookName + " not found.")
 	}
+	return nil
 }
+
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
 	return facades.Orm().Transaction(func(tx orm.Transaction) error {
 		var myFlowlink models.Flowlink
