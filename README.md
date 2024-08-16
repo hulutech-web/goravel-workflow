@@ -95,10 +95,19 @@ func (receiver *AppServiceProvider) Boot(app foundation.Application) {
 ```
 ### 二、框架路由说明
 ```go
-router := app.MakeRoute()
+package routes
 
-	userController := controllers.NewUserController()
-	router.Get("/users/{id}", userController.Show)
+import (
+	"github.com/goravel/framework/contracts/foundation"
+	"github.com/goravel/framework/contracts/route"
+	"github.com/goravel/framework/facades"
+	controllers "github.com/hulutech-web/goravel-workflow/controllers"
+	"github.com/hulutech-web/goravel-workflow/middleware"
+)
+
+func Api(app foundation.Application) {
+	router := app.MakeRoute()
+
 	authController := controllers.NewAuthController()
 	router.Post("/api/auth/login", authController.AdminLogin)
 	router.Post("/api/h5/login", authController.H5Login)
@@ -111,8 +120,7 @@ router := app.MakeRoute()
 		//文件上传
 		uploadCtrl := controllers.NewUploadController()
 		router.Post("/upload", uploadCtrl.Upload)
-		userCtrl := controllers.NewUserController()
-		router.Get("/user", userCtrl.Index)
+
 		homeCtrl := controllers.NewHomeController()
 		router.Get("/home", homeCtrl.Index)
 
@@ -172,6 +180,9 @@ router := app.MakeRoute()
 		router.Post("pass", procCtrl.Pass)
 		//驳回
 		router.Post("unpass", procCtrl.UnPass)
+	})
+}
+
 ```
 
 ### 三、前端集成
