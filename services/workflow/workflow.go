@@ -44,7 +44,7 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 	fmt.Printf("Registered hook: %s\n", name)
 }
 
-// NotifyStartThis 调用 NotifyStartThis 钩子
+// NotifyStartThis
 func (w *Workflow) NotifyStartThis(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyStartThis :%d\n", id)
 
@@ -52,7 +52,7 @@ func (w *Workflow) NotifyStartThis(id uint) error {
 
 }
 
-// NotifyNextAuditor 调用 NotifyNextAuditor 钩子
+// NotifyNextAuditor
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 
