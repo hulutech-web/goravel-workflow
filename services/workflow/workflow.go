@@ -57,7 +57,7 @@ func (w *Workflow) NotifySendOne(id uint) error {
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 
-	w.invokeHooks("NotifyNextAuditor", id)
+	w.invokeHooks("NotifyNextAuditorHook", id)
 
 	return nil
 }
