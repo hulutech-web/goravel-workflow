@@ -46,7 +46,7 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 
 // NotifyStartThis 调用 NotifyStartThis 钩子
 func (w *Workflow) NotifyStartThis(id uint) error {
-	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
+	fmt.Printf("BaseWorkflow.NotifyStartThis :%d\n", id)
 
 	return w.invokeHooks("NotifyStartThis", id)
 
