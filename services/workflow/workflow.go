@@ -16,7 +16,7 @@ import (
 )
 
 type Workflow struct {
-	hooks map[string]reflect.Value // 修改为 reflect.Value 来存储方法
+	hooks map[string][]reflect.Value // 修改为 存储多个钩子函数
 	mutex sync.Mutex
 }
 
@@ -30,7 +30,7 @@ var (
 func NewBaseWorkflow() *Workflow {
 	once.Do(func() {
 		baseWorkflowInstance = &Workflow{
-			hooks: make(map[string]reflect.Value),
+			hooks: make(map[string][]reflect.Value),
 		}
 	})
 	return baseWorkflowInstance
@@ -40,7 +40,7 @@ func NewBaseWorkflow() *Workflow {
 func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 	w.mutex.Lock()
 	defer w.mutex.Unlock()
-	w.hooks[name] = method
+	w.hooks[name] = append(w.hooks[name], method)
 	fmt.Printf("Registered hook: %s\n", name)
 }
 
@@ -48,45 +48,40 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 func (w *Workflow) NotifySendOne(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
 
-	// 在调用钩子前解锁
-	if hook, ok := w.hooks["NotifySendOneHook"]; ok {
-		// 检查方法签名
-		methodType := hook.Type()
-		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
-			fmt.Println("Calling NotifySendOneHook...")
-			hook.Call([]reflect.Value{reflect.ValueOf(id)})
-			fmt.Println("NotifySendOneHook completed.")
-		} else {
-			fmt.Println("Method signature mismatch or invalid hook.")
-		}
-	} else {
-		fmt.Println("Hook not found.")
-	}
+	w.invokeHooks("NotifySendOneHook", id)
 
 	return nil
 }
 
 // NotifyNextAuditor 调用 NotifyNextAuditor 钩子
 func (w *Workflow) NotifyNextAuditor(id uint) error {
-
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
-	if hook, ok := w.hooks["NotifyNextAuditor"]; ok {
 
-		// 检查方法签名
-		methodType := hook.Type()
-		if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
-			fmt.Println("Calling NotifyNextAuditorHook...")
-			hook.Call([]reflect.Value{reflect.ValueOf(id)})
-			fmt.Println("NotifyNextAuditorHook completed.")
-		} else {
-			fmt.Println("Method signature mismatch or invalid hook.")
-		}
-	} else {
-		fmt.Println("Hook not found.")
-	}
+	w.invokeHooks("NotifyNextAuditor", id)
+
 	return nil
 }
 
+// invokeHooks 用于依次调用所有注册的钩子方法
+func (w *Workflow) invokeHooks(hookName string, id uint) {
+	if hooks, ok := w.hooks[hookName]; ok {
+		for _, hook := range hooks {
+			w.mutex.Lock()
+			defer w.mutex.Unlock()
+			// 检查方法签名
+			methodType := hook.Type()
+			if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
+				fmt.Printf("Calling %s...\n", hookName)
+				hook.Call([]reflect.Value{reflect.ValueOf(id)})
+				fmt.Printf("%s completed.\n", hookName)
+			} else {
+				fmt.Printf("Method signature mismatch or invalid hook for %s.\n", hookName)
+			}
+		}
+	} else {
+		fmt.Printf("Hook %s not found.\n", hookName)
+	}
+}
 func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Flowlink) error {
 	return facades.Orm().Transaction(func(tx orm.Transaction) error {
 		var myFlowlink models.Flowlink
