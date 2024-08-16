@@ -425,6 +425,9 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						if proc.Entry.EnterProcess.ChildBackProcess > 0 {
 							w.goToProcess(*proc.Entry.ParentEntry, proc.Entry.EnterProcess.ChildBackProcess)
 							proc.Entry.ParentEntry.ProcessID = cast.ToUint(proc.Entry.EnterProcess.ChildBackProcess)
+							//	通知设置的父流程步骤中的审批人
+							//ins := NewBaseWorkflow()
+							//ins.NotifySendOne(cast.ToUint(proc.AuditorID))
 						} else {
 							//默认进入父流程步骤下一步
 							parentFlowlink := models.Flowlink{}
