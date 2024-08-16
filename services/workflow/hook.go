@@ -1,6 +1,6 @@
 package workflow
 
 type Hook interface {
-	NotifySendOne(id uint) error
+	NotifyStartThis(id uint) error
 	NotifyNextAuditor(id uint) error
 }

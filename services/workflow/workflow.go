@@ -45,7 +45,7 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 }
 
 // NotifySendOne 调用 NotifySendOne 钩子
-func (w *Workflow) NotifySendOne(id uint) error {
+func (w *Workflow) NotifyStartThis(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
 
 	w.invokeHooks("NotifySendOneHook", id)
@@ -71,9 +71,9 @@ func (w *Workflow) invokeHooks(hookName string, id uint) {
 			// 检查方法签名
 			methodType := hook.Type()
 			if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
-				fmt.Printf("Calling %s...\n", hookName)
+				//fmt.Printf("Calling %s...\n", hookName)
 				hook.Call([]reflect.Value{reflect.ValueOf(id)})
-				fmt.Printf("%s completed.\n", hookName)
+				//fmt.Printf("%s completed.\n", hookName)
 			} else {
 				fmt.Printf("Method signature mismatch or invalid hook for %s.\n", hookName)
 			}
@@ -445,7 +445,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					var notifyProc models.Proc
 					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
 				}
-				baseWorkflowInstance.NotifySendOne(proc.EntryID)
+				w.NotifyStartThis(proc.EntryID)
 
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
@@ -574,6 +574,6 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
-	baseWorkflowInstance.NotifySendOne(proc.Entry.EmpID)
+	w.NotifyStartThis(proc.Entry.EmpID)
 
 }
