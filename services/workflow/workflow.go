@@ -48,7 +48,7 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 func (w *Workflow) NotifyStartThis(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyStartThis :%d\n", id)
 
-	return w.invokeHooks("NotifyStartThis", id)
+	return w.invokeHooks("NotifyStartThisHook", id)
 
 }
 
@@ -56,7 +56,7 @@ func (w *Workflow) NotifyStartThis(id uint) error {
 func (w *Workflow) NotifyNextAuditor(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifyNextAuditor:%d\n", id)
 
-	return w.invokeHooks("NotifyNextAuditor", id)
+	return w.invokeHooks("NotifyNextAuditorHook", id)
 
 }
 
