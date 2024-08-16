@@ -402,6 +402,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						map_entry["status"] = 9
 						map_entry["child"] = 0
 						tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
+						//通知发起人，审批结束
+						w.NotifySendOne(proc.Entry.ID)
 					} else {
 						//	进入设置的父流程步骤
 						if proc.Entry.EnterProcess.ChildBackProcess > 0 {
@@ -410,7 +412,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						} else {
 							//默认进入父流程步骤下一步
 							parentFlowlink := models.Flowlink{}
-							tx.Model(&models.Flowlink{}).Where("process_id=?", proc.Entry.EnterProcessID).Where("type=?", "Condition").First(&parentFlowlink)
+							tx.Model(&models.Flowlink{}).Where("process_id=?", proc.Entry.EnterProcessID).
+								Where("type=?", "Condition").First(&parentFlowlink)
 							if parentFlowlink.NextProcessID == -1 {
 								parentEntry := models.Entry{}
 								tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).First(&parentEntry)
@@ -421,7 +424,9 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
 
 								var notifyProc models.Proc
-								tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
+								tx.Model(&models.Proc{}).Where("id=?", proc.ID).With("Emp").FirstOrFail(&notifyProc)
+								//通知发起人，审批结束
+								w.NotifySendOne(proc.Entry.EmpID)
 							} else {
 								w.goToProcess(*proc.Entry.ParentEntry, parentFlowlink.NextProcessID)
 								proc.Entry.ParentEntry.ProcessID = cast.ToUint(parentFlowlink.NextProcessID)
@@ -431,7 +436,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								map_entry["process_id"] = parentFlowlink.NextProcessID
 								map_entry["status"] = 0
 								tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
-
+								//通知到下一个审批人
+								w.NotifySendOne(cast.ToUint(proc.AuditorID))
 							}
 						}
 						pentry := models.Entry{}
@@ -445,8 +451,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					var notifyProc models.Proc
 					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
 				}
-				baseWorkflowInstance.NotifySendOne(proc.EntryID)
-
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
 				auditors := []models.Emp{}
