@@ -44,11 +44,11 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 	fmt.Printf("Registered hook: %s\n", name)
 }
 
-// NotifySendOne 调用 NotifySendOne 钩子
+// NotifyStartThis 调用 NotifyStartThis 钩子
 func (w *Workflow) NotifyStartThis(id uint) error {
 	fmt.Printf("BaseWorkflow.NotifySendOne :%d\n", id)
 
-	w.invokeHooks("NotifySendOneHook", id)
+	w.invokeHooks("NotifyStartThis", id)
 
 	return nil
 }
@@ -71,9 +71,9 @@ func (w *Workflow) invokeHooks(hookName string, id uint) {
 			// 检查方法签名
 			methodType := hook.Type()
 			if methodType.NumIn() == 1 && methodType.In(0).Kind() == reflect.Uint {
-				//fmt.Printf("Calling %s...\n", hookName)
+				fmt.Printf("Calling %s...\n", hookName)
 				hook.Call([]reflect.Value{reflect.ValueOf(id)})
-				//fmt.Printf("%s completed.\n", hookName)
+				fmt.Printf("%s completed.\n", hookName)
 			} else {
 				fmt.Printf("Method signature mismatch or invalid hook for %s.\n", hookName)
 			}
