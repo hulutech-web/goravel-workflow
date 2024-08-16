@@ -347,7 +347,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			})
 			//通知下一个审批人
 			//通知发起人，被驳回
-			w.NotifyNextAuditor(auditor.ID)
+			ins := NewBaseWorkflow()
+			ins.NotifyNextAuditor(auditor.ID)
 		}
 		procEntry := models.Entry{}
 		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
@@ -417,7 +418,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						map_entry["child"] = 0
 						tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
 						//通知发起人，审批结束
-						w.NotifySendOne(proc.Entry.ID)
+						ins := NewBaseWorkflow()
+						ins.NotifySendOne(proc.Entry.ID)
 					} else {
 						//	进入设置的父流程步骤
 						if proc.Entry.EnterProcess.ChildBackProcess > 0 {
@@ -440,7 +442,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								var notifyProc models.Proc
 								tx.Model(&models.Proc{}).Where("id=?", proc.ID).With("Emp").FirstOrFail(&notifyProc)
 								//通知发起人，审批结束
-								w.NotifySendOne(proc.Entry.EmpID)
+								ins := NewBaseWorkflow()
+								ins.NotifySendOne(proc.Entry.EmpID)
 							} else {
 								w.goToProcess(*proc.Entry.ParentEntry, parentFlowlink.NextProcessID)
 								proc.Entry.ParentEntry.ProcessID = cast.ToUint(parentFlowlink.NextProcessID)
@@ -451,7 +454,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								map_entry["status"] = 0
 								tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
 								//通知到下一个审批人
-								w.NotifySendOne(cast.ToUint(proc.AuditorID))
+								ins := NewBaseWorkflow()
+								ins.NotifySendOne(cast.ToUint(proc.AuditorID))
 							}
 						}
 						pentry := models.Entry{}
@@ -488,7 +492,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						IsRead:      0,
 					})
 					//通知下一个审批人
-					w.NotifyNextAuditor(auditor.ID)
+					ins := NewBaseWorkflow()
+					ins.NotifyNextAuditor(auditor.ID)
 				}
 				tx.Model(&models.Entry{}).Where("id=?", proc.Entry.ID).Update("process_id", cast.ToUint(fklink.NextProcessID))
 				//	判断是否存在父进程
@@ -592,6 +597,7 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
 	}
-	w.NotifySendOne(proc.Entry.EmpID)
+	ins := NewBaseWorkflow()
+	ins.NotifySendOne(proc.Entry.EmpID)
 
 }
