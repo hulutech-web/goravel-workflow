@@ -287,6 +287,8 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 				for _, dept := range processRequest.RangeDeptIds {
 					auditor += cast.ToString(dept) + ","
 				}
+				//去掉最后一个,号
+				auditor = strings.TrimSuffix(auditor, ",")
 				tx.Model(&models.Flowlink{}).Create(&models.Flowlink{FlowID: flow.ID, Type: "Dept", ProcessID: cast.ToUint(id), Auditor: auditor, NextProcessID: 0, Sort: 100})
 			}
 		} else {
