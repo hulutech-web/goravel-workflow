@@ -33,7 +33,7 @@ type ProcessRequest struct {
 	RangeEmpIds      []int              `json:"range_emp_ids"`
 	RangeEmpText     []string           `json:"range_emp_text"`
 	RangeDeptIds     []int              `json:"range_dept_ids"`
-	RangeDeptText    []int              `json:"range_dept_text"`
+	RangeDeptText    []string           `json:"range_dept_text"`
 	ProcessMode      string             `json:"process_mode"`
 	ProcessCondition []ProcessCondition `json:"process_condition"`
 	StyleWidth       int                `json:"style_width"`
