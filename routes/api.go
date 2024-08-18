@@ -59,6 +59,11 @@ func Api(app foundation.Application) {
 		//流程轨迹
 		flowlinkCtrl := controllers.NewFlowlinkController()
 		router.Post("flowlink", flowlinkCtrl.Update)
+
+		//模板
+		templateCtrl := controllers.NewTemplateController()
+		router.Resource("template", templateCtrl)
+
 		//模板控件
 		templateformCtrl := controllers.NewTemplateformController()
 		router.Get("template/{id}/templateform", templateformCtrl.Index)
@@ -66,9 +71,6 @@ func Api(app foundation.Application) {
 		router.Put("templateform/{id}", templateformCtrl.Update)
 		router.Delete("templateform/{id}", templateformCtrl.Destroy)
 		router.Get("templateform/{id}", templateformCtrl.Show)
-		//模板
-		templateCtrl := controllers.NewTemplateController()
-		router.Resource("template", templateCtrl)
 
 		//	流程
 		processCtrl := controllers.NewProcessController()

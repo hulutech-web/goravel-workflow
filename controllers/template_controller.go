@@ -53,9 +53,18 @@ func (r *TemplateController) Store(ctx http.Context) http.Response {
 }
 
 func (r *TemplateController) Update(ctx http.Context) http.Response {
-	return nil
+	template := models.Template{}
+	ctx.Request().Bind(&template)
+	facades.Orm().Query().Model(&models.Template{}).Where("id=?", template.ID).Update("template_name", template.TemplateName)
+	return httpfacades.NewResult(ctx).Success("更新成功", template)
 }
 
 func (r *TemplateController) Destroy(ctx http.Context) http.Response {
-	return nil
+	idInt := ctx.Request().RouteInt64("id")
+	//删除关联
+	facades.Orm().Query().Model(&models.TemplateForm{}).Where("template_id=?", idInt).Delete(&models.TemplateForm{})
+	//删除模板
+	facades.Orm().Query().Model(&models.Template{}).Where("id=?", idInt).Delete(&models.Template{})
+	return httpfacades.NewResult(ctx).Success("删除成功", nil)
+
 }
