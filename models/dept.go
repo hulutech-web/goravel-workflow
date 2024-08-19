@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/goravel/framework/database/orm"
-	"gorm.io/gorm"
 	"strings"
 )
 
@@ -27,12 +26,7 @@ func (d *Dept) Recursion(models []Dept, html string, pid uint, level int) []Dept
 			dept.Level = level + 1
 			result = append(result, dept)
 			result = append(result, d.Recursion(append([]Dept{}, models[i+1:]...), html, dept.ID, level+1)...)
-			//break // After processing current node, break to avoid reprocessing same nodes
 		}
 	}
 	return result
-}
-
-func (d *Dept) LoadAssociations(db *gorm.DB) error {
-	return db.Preload("Director").Preload("Manager").First(d).Error
 }
