@@ -8,11 +8,12 @@
 
 
 ### 一、安装
-```go
+```shell
 go get  github.com/hulutech-web/goravel-workflow
 ```
 #### 1.1 注册服务提供者:config/app.go
-```go
+```shell
+
 import	"github.com/hulutech-web/goravel-workflow"
 ```
 
@@ -27,12 +28,13 @@ func init() {
 ```
 ### 二、发布资源，默认将发布2类资源，一是配置文件，而是数据表迁移
 #### 2.1 发布资源:config/app.go
-```go
+```shell
 go run . artisan vendor:publish --package=github.com/hulutech-web/goravel-workflow
 
 ```
 #### 2.2 发布迁移文件:database
-```go
+
+```shell
 artisan vendor:publish --package=github.com/hulutech-web/goravel-workflow
 ```
 #### 2.3 执行迁移建表
@@ -46,7 +48,7 @@ func (s *DatabaseSeeder) Run() error {
 
 ```
 #### 2.4 执行迁移
-```go
+```shell
 go run . artisan migrate:refresh --seed
 ```
 
