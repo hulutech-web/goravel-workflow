@@ -207,26 +207,27 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 				auditor_ids = append(auditor_ids, cast.ToInt(id))
 			}
 		}
-		//	2、指定部门
+		//	2、指定部门（指定部门时，可能指定多个部门，分别找到部门的主管，并找到对应的emp_id）
 		concurrent_dept_flowlink := models.Flowlink{}
-		query.Model(&models.Flowlink{}).Where("type = ?", "Emp").Where("process_id=?", next_process_id).
+		query.Model(&models.Flowlink{}).Where("type = ?", "Dept").Where("process_id=?", next_process_id).
 			First(&concurrent_dept_flowlink)
 
 		if concurrent_dept_flowlink.ID > 0 {
 			dept_id_strs := []string{}
 			//按照,分割concurrent_flowlink.Auditor
-			dept_id_strs = strings.Split(concurrent_emp_flowlink.Auditor, ",")
+			dept_id_strs = strings.Split(concurrent_dept_flowlink.Auditor, ",")
 			dept_ids := []int{}
 			for _, id := range dept_id_strs {
 				dept_ids = append(dept_ids, cast.ToInt(id))
 			}
 			emp_ids := []int{}
-			query.Model(&models.Emp{}).Where("dept_id IN (?)", dept_ids).Pluck("id", &emp_ids)
+			//默认查找部门主管director_id，它对应着员工的id
+			query.Model(&models.Dept{}).Select("director_id").Where("dept_id IN (?)", dept_ids).Pluck("director_id", &emp_ids)
 			for _, id := range emp_ids {
 				auditor_ids = append(auditor_ids, id)
 			}
 		}
-		//	3、指定角色，待完善
+		//	3、指定角色，暂时不需要
 	}
 	ret_auditor_ids := uniqueSlice(auditor_ids)
 	//	对auditor_ids去重

@@ -235,7 +235,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 		tx.Model(&models.Flowlink{}).Where("id=?", key).Update("expression", jsonStr)
 	}
 
-	//@袁浩：改，如果当前的processRequest.AutoPerson=="0",更新当前的步骤
+	//@改，如果当前的processRequest.AutoPerson=="0",更新当前的步骤
 	if processRequest.AutoPerson == "0" {
 		tx.Model(&models.Flowlink{}).Where("flow_id=?", flow.ID).Where("process_id=?", id).
 			Where("type=?", "Condition").Update("auditor", processRequest.AutoPerson)
