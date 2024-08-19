@@ -222,7 +222,7 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 			}
 			emp_ids := []int{}
 			//默认查找部门主管director_id，它对应着员工的id
-			query.Model(&models.Dept{}).Select("director_id").Where("dept_id IN (?)", dept_ids).Pluck("director_id", &emp_ids)
+			query.Model(&models.Dept{}).Select("director_id").Where("id IN (?)", dept_ids).Pluck("director_id", &emp_ids)
 			for _, id := range emp_ids {
 				auditor_ids = append(auditor_ids, id)
 			}
