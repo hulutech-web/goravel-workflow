@@ -1,4 +1,4 @@
-![goravel-workflow](https://github.com/hulutech-web/goravel-workflow/blob/master/assets/workflow.png?raw=true#pic_center =300x300)
+![goravel-workflow](https://github.com/hulutech-web/goravel-workflow/blob/master/assets/workflow.png?raw=true #pic_center =300x300)
 ### 文档
 
 
