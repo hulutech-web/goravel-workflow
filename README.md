@@ -1,5 +1,10 @@
-![goravel-workflow](https://github.com/hulutech-web/goravel-workflow/blob/master/assets/workflow.png?raw=true)
-使用文档[文档](https://hulutech-web.github.io/goravel-workflow.github.io/)
+![goravel-workflow](https://github.com/hulutech-web/goravel-workflow/blob/master/assets/workflow.png?raw=true#pic_center =300x300)
+### 文档
+
+
+[文档](https://hulutech-web.github.io/goravel-workflow.github.io/)
+
+
 ### 一、安装
 ```go
 go get  github.com/hulutech-web/goravel-workflow
