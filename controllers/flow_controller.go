@@ -43,7 +43,10 @@ func (r *FlowController) Create(ctx http.Context) http.Response {
 }
 
 func (r *FlowController) Show(ctx http.Context) http.Response {
-	return nil
+	id := ctx.Request().RouteInt("id")
+	var flow models.Flow
+	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", id).Find(&flow)
+	return httpfacades.NewResult(ctx).Success("", flow)
 }
 
 func (r *FlowController) Store(ctx http.Context) http.Response {
