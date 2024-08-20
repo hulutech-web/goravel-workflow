@@ -6,6 +6,10 @@ import "fmt"
 type DistributePlugin struct {
 }
 
+func NewDistributePlugin() *DistributePlugin {
+	return &DistributePlugin{}
+}
+
 func (c *DistributePlugin) Register() string {
 	return "official_plugins.distribute"
 }
