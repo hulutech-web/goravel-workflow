@@ -30,6 +30,10 @@ func (c *Collector) RegisterPlugin() {
 	defer c.mutex.Unlock()
 	for _, plugin := range c.plugins {
 		plugin.Register()
-		plugin.Action()
+	}
+	for _, plugin := range c.plugins {
+		action := plugin.Action()
+		//调用这个建表方法
+		action("test")
 	}
 }
