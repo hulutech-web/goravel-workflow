@@ -3,10 +3,16 @@ package official_plugins
 import (
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/goravel/framework/contracts/foundation"
 	"github.com/goravel/framework/database/orm"
 	"github.com/goravel/framework/facades"
+	"sync"
+)
+
+var (
+	Once sync.Once
 )
 
 // 分配任务插件
@@ -70,29 +76,33 @@ type Plugin struct {
 }
 
 func (c *DistributePlugin) AutoMigrate() error {
-	orm := BootMS()
-	err := orm.AutoMigrate(&Plugin{}, &PluginConfig{})
-	if err != nil {
-		fmt.Println("AutoMigrate error:", err)
-		// 处理错误
-	} else {
-		fmt.Println("AutoMigrate successful")
-	}
-	row := orm.Create(&Plugin{
-		Name:    "数据二次分配",
-		Version: "v1.0",
-		Status:  1,
-		Description: "1、设计流程时，将某一个数字类型的字段绑定插件，" +
-			"2、节点设计规则，在某一个节点”如：主管审批“，规则为：员工1：500元，员工2：1000元，绑定该字段进行二次分配，下一个节点的审批人获取到该规则，" +
-			"3、数据查看，下一节点审批人，根据规则获取到自身可以查看的规则内容，员工1：看到奖励500元，员工2：看到奖励1000元",
-		Author: "hulu-web",
+	err_ := errors.New("distribute_plugin")
+	Once.Do(func() {
+		orm := BootMS()
+		err := orm.AutoMigrate(&Plugin{}, &PluginConfig{})
+		if err != nil {
+			fmt.Println("AutoMigrate error:", err)
+			// 处理错误
+		} else {
+			fmt.Println("AutoMigrate successful")
+		}
+		row := orm.Create(&Plugin{
+			Name:    "数据二次分配",
+			Version: "v1.0",
+			Status:  1,
+			Description: "1、设计流程时，将某一个数字类型的字段绑定插件，" +
+				"2、节点设计规则，在某一个节点”如：主管审批“，规则为：员工1：500元，员工2：1000元，绑定该字段进行二次分配，下一个节点的审批人获取到该规则，" +
+				"3、数据查看，下一节点审批人，根据规则获取到自身可以查看的规则内容，员工1：看到奖励500元，员工2：看到奖励1000元",
+			Author: "hulu-web",
+		})
+		if row.RowsAffected == 0 || row.Error != nil {
+			err_ = row.Error
+			fmt.Println("Create error:", err)
+		} else {
+			fmt.Println("Create successful")
+		}
 	})
-	if row.RowsAffected == 0 || row.Error != nil {
-		fmt.Println("Create error:", err)
-	} else {
-		fmt.Println("Create successful")
-	}
-	return err
+	return err_
 }
 
 // 插件路由方法，为节点绑定执行插件
