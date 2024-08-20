@@ -45,7 +45,7 @@ func (receiver *Plugin) Handle(ctx console.Context) error {
 	if err != nil {
 		return err
 	}
-	if c == "yes" {
+	if c == "是" {
 		ctx.Info("创建中...")
 		orm := official_plugins.BootMS()
 		orm.Create(official_plugins.Plugin{
