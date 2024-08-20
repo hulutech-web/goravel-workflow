@@ -37,8 +37,6 @@ func (c *Collector) Boot() {
 }
 
 func (c *Collector) RegisterPlugin(plugin_name string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
 	for _, plugin := range c.plugins {
 		plugin.Register()
 	}
