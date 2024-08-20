@@ -4,7 +4,6 @@ go 1.22.5
 
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0
-	github.com/go-resty/resty/v2 v2.14.0
 	github.com/goravel/framework v1.14.4
 	github.com/hulutech-web/http_result v1.0.17
 	github.com/joho/godotenv v1.3.0
@@ -63,6 +62,7 @@ require (
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-redsync/redsync/v4 v4.8.1 // indirect
+	github.com/go-resty/resty/v2 v2.14.0 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect

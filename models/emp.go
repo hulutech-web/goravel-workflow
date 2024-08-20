@@ -26,3 +26,11 @@ func (e *Emp) Passhook() {
 func (e *Emp) UnPasshook() {
 	fmt.Println("Emp UnPasshook called.")
 }
+
+func (u *Emp) Register() string {
+	return "Emp"
+}
+
+func (u *Emp) Action() func(string) error {
+	return nil
+}
