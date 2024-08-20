@@ -79,8 +79,15 @@ func (c *DistributePlugin) AutoMigrate() error {
 	err_ := errors.New("distribute_plugin")
 	Once.Do(func() {
 		orm := BootMS()
-		err := orm.AutoMigrate(&Plugin{}, &PluginConfig{})
+		err := errors.New("distribute_plugin")
+		if !orm.Migrator().HasTable(&Plugin{}) {
+			err = orm.AutoMigrate(&Plugin{})
+		}
+		if !orm.Migrator().HasTable(&PluginConfig{}) {
+			err = orm.AutoMigrate(&PluginConfig{})
+		}
 		if err != nil {
+			err_ = err
 			fmt.Println("AutoMigrate error:", err)
 			// 处理错误
 		} else {
