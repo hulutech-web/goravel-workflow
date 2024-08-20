@@ -20,11 +20,9 @@ type Collector struct {
 var collector *Collector
 
 func NewCollector(plugins []Plugin) *Collector {
-	once.Do(func() {
-		collector = &Collector{
-			plugins: plugins,
-		}
-	})
+	if collector == nil {
+		collector = &Collector{plugins: plugins}
+	}
 	return collector
 }
 
