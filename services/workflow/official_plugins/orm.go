@@ -5,15 +5,20 @@ import (
 	"github.com/goravel/framework/database/gorm"
 	"github.com/goravel/framework/facades"
 	gormio "gorm.io/gorm"
+	"sync"
+)
+
+var (
+	once sync.Once
 )
 
 // 申明一个MYSQL连接GormIns
-var GormIns *gormio.DB
+var gormIns *gormio.DB
 
 func BootMS() *gormio.DB {
-	var gormImpl = gorm.NewGormImpl(facades.Config(), "mysql", db.NewConfigImpl(facades.Config(), "mysql"), gorm.NewDialectorImpl(facades.Config(), "mysql"))
-	//	获取实例
-	gormIns, _ := gormImpl.Make()
-	GormIns = gormIns
-	return GormIns
+	once.Do(func() {
+		var gormImpl = gorm.NewGormImpl(facades.Config(), "mysql", db.NewConfigImpl(facades.Config(), "mysql"), gorm.NewDialectorImpl(facades.Config(), "mysql"))
+		gormIns, _ = gormImpl.Make()
+	})
+	return gormIns
 }
