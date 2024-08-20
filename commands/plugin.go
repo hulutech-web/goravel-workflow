@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
@@ -48,12 +49,24 @@ func (receiver *Plugin) Handle(ctx console.Context) error {
 	if c == "是" {
 		ctx.Info("创建中...")
 		orm := official_plugins.BootMS()
-		orm.Create(official_plugins.Plugin{
+		if err != nil {
+			fmt.Println("AutoMigrate error:", err)
+			// 处理错误
+		} else {
+			fmt.Println("AutoMigrate successful")
+		}
+		row := orm.Create(&official_plugins.Plugin{
 			Name:        name,
 			Version:     version,
+			Status:      1,
 			Description: description,
 			Author:      author,
 		})
+		if row.RowsAffected == 0 || row.Error != nil {
+			fmt.Println("Create error:", err)
+		} else {
+			fmt.Println("Create successful")
+		}
 	} else {
 		ctx.Info("取消创建")
 		return nil
