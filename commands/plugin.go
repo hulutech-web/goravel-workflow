@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
@@ -34,22 +33,32 @@ func (receiver *Plugin) Handle(ctx console.Context) error {
 	version, _ := ctx.Ask("插件版本?")
 	description, _ := ctx.Ask("功能描述?")
 	author, _ := ctx.Ask("插件作者?")
-	if _isOk, err := ctx.Confirm("确认添加吗?", console.ConfirmOption{
-		Default:     true,
-		Affirmative: "是",
-		Description: "确认添加吗？",
-		Negative:    "否",
-	}); err != nil && _isOk {
-		result := official_plugins.GormIns.Create(&official_plugins.Plugin{
+	question := "确认创建吗?"
+	options := []console.Choice{
+		{Key: "yes", Value: "是", Selected: true},
+		{Key: "no", Value: "否"},
+	}
+
+	c, err := ctx.Choice(question, options, console.ChoiceOption{
+		Default: "yes",
+	})
+	if err != nil {
+		return err
+	}
+	if c == "yes" {
+		ctx.Info("创建中...")
+		orm := official_plugins.BootMS()
+		orm.Create(official_plugins.Plugin{
 			Name:        name,
 			Version:     version,
 			Description: description,
 			Author:      author,
 		})
-
-		ctx.Info(fmt.Sprintf("创建成功%d", result.RowsAffected))
-		return err
+	} else {
+		ctx.Info("取消创建")
+		return nil
 	}
+
 	ctx.Info("创建失败")
 	return nil
 }
