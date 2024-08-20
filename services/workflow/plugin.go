@@ -49,8 +49,6 @@ func (c *Collector) RegisterPlugin(plugin_name string) {
 }
 
 func (c *Collector) AddHook(hook string) {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
 	c.hooks = append(c.hooks, hook)
 }
 
