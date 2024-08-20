@@ -17,6 +17,7 @@ var (
 
 // 分配任务插件
 type DistributePlugin struct {
+	HookName string
 }
 
 func NewDistributePlugin() *DistributePlugin {
@@ -34,8 +35,17 @@ func (c *DistributePlugin) Register() string {
 func (c *DistributePlugin) Action() func(string) error {
 	fmt.Println("distribute plugin action called")
 	return func(task string) error {
+		c.AddHook(task)
 		return c.AutoMigrate()
 	}
+}
+
+func (c *DistributePlugin) AddHook(hook string) {
+	c.HookName = hook
+}
+
+func (c *DistributePlugin) GetHooks() []string {
+	return []string{}
 }
 
 type RuleItem struct {
