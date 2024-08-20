@@ -86,7 +86,7 @@ func (c *DistributePlugin) AutoMigrate() error {
 		} else {
 			fmt.Println("AutoMigrate successful")
 		}
-		row := orm.Create(&Plugin{
+		row := orm.FirstOrCreate(&Plugin{
 			Name:    "数据二次分配",
 			Version: "v1.0",
 			Status:  1,
