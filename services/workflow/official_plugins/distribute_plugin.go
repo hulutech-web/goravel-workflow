@@ -68,11 +68,19 @@ type PluginConfig struct {
 
 type Plugin struct {
 	orm.Model
-	Name        string `gorm:"column:name;unique;comment:'插件名称'" json:"name" form:"name"`
-	Version     string `gorm:"column:version;comment:'版本号'" json:"version" form:"version"`
-	Status      int    `gorm:"column:status;comment:'状态'" json:"status" form:"status"`
-	Description string `gorm:"column:description;comment:'描述'" json:"description" form:"description"`
-	Author      string `gorm:"column:author;comment:'作者'" json:"author" form:"author"`
+	Name          string         `gorm:"column:name;unique;comment:'插件名称'" json:"name" form:"name"`
+	Version       string         `gorm:"column:version;comment:'版本号'" json:"version" form:"version"`
+	Status        int            `gorm:"column:status;comment:'状态'" json:"status" form:"status"`
+	Description   string         `gorm:"column:description;comment:'描述'" json:"description" form:"description"`
+	Author        string         `gorm:"column:author;comment:'作者'" json:"author" form:"author"`
+	PluginConfigs []PluginConfig `gorm:"foreignKey:PluginID;references:ID"`
+}
+
+// flow_plugin中间表
+type FlowPlugin struct {
+	orm.Model
+	PluginID uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
+	FlowID   uint `gorm:"column:flow_id;comment:'流程ID'" json:"flow_id" form:"flow_id"`
 }
 
 func (c *DistributePlugin) AutoMigrate() error {
@@ -85,6 +93,9 @@ func (c *DistributePlugin) AutoMigrate() error {
 		}
 		if !orm.Migrator().HasTable(&PluginConfig{}) {
 			err = orm.AutoMigrate(&PluginConfig{})
+		}
+		if !orm.Migrator().HasTable(&FlowPlugin{}) {
+			err = orm.AutoMigrate(&FlowPlugin{})
 		}
 		if err != nil {
 			err_ = err
@@ -117,15 +128,16 @@ func (c *DistributePlugin) RouteApi(app foundation.Application) {
 	router := app.MakeRoute()
 	distributeCtrl := NewDeptController()
 
-	//开发者安装插件
-	router.Post("api/plugin/install", distributeCtrl.Install)
-	//开发者提交插件信息，产出插件
+	//1、命令行新建一个插件
+	//2、开发者通过设计，设计出该插件的一些选项和规则
 	router.Post("api/plugin/product", distributeCtrl.Product)
-	//流程绑定插件
-	router.Post("api/flow/bind_plugin", distributeCtrl.Bind)
+	//3、为流程选择某些插件
+	router.Post("api/flow/select_plugins", distributeCtrl.SelectPlugins)
+	//4、获取系统中已有的插件
+	router.Get("api/plugin/list", distributeCtrl.List)
 }
 
-// 插件执行方法
+// 插件执行方法，当流程执行到某一个流程的某一个节点，会自动调用该执行方法，将数据交给下一级
 func (c *DistributePlugin) Execute(flowID uint, processID uint) error {
 	//当当前节点执行时，先查询该flowID和processID中是否存在数据，如果存在，则将flowID对应的entry_data中的
 	//扩展字段找出，并应用执行方案
