@@ -8,7 +8,7 @@ type Plugin interface {
 	Register() string
 	Action() func(string) error
 	AddHook(hook string)
-	GetHooks() []string
+	Execute(plugin_name string, args ...interface{}) error
 }
 
 type Collector struct {
@@ -17,10 +17,19 @@ type Collector struct {
 	plugins []Plugin
 }
 
+var collector *Collector
+
 func NewCollector(plugins []Plugin) *Collector {
-	return &Collector{
-		plugins: plugins,
-	}
+	once.Do(func() {
+		collector = &Collector{
+			plugins: plugins,
+		}
+	})
+	return collector
+}
+
+func GetCollectorIns() *Collector {
+	return collector
 }
 
 func (c *Collector) Boot() {
@@ -47,4 +56,16 @@ func (c *Collector) AddHook(hook string) {
 
 func (c *Collector) GetHooks() []string {
 	return c.hooks
+}
+
+// 执行插件中的Execute方法
+func (c *Collector) DoPluginsExec(plugin_name string, args ...interface{}) error {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	for _, plugin := range c.plugins {
+		if err := plugin.Execute(plugin_name, args...); err != nil {
+			return err
+		}
+	}
+	return nil
 }

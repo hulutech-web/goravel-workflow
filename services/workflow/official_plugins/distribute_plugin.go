@@ -44,10 +44,6 @@ func (c *DistributePlugin) AddHook(hook string) {
 	c.HookName = hook
 }
 
-func (c *DistributePlugin) GetHooks() []string {
-	return []string{}
-}
-
 type RuleItem struct {
 	RuleName  string `json:"rule_name" form:"rule_name"`
 	RuleTitle string `json:"rule_title" form:"rule_title"`
@@ -148,8 +144,16 @@ func (c *DistributePlugin) RouteApi(app foundation.Application) {
 }
 
 // 插件执行方法，当流程执行到某一个流程的某一个节点，会自动调用该执行方法，将数据交给下一级
-func (c *DistributePlugin) Execute(flowID uint, processID uint) error {
+func (c *DistributePlugin) Execute(plugin_name string, args ...interface{}) error {
 	//当当前节点执行时，先查询该flowID和processID中是否存在数据，如果存在，则将flowID对应的entry_data中的
 	//扩展字段找出，并应用执行方案
+	if plugin_name != c.HookName {
+		return nil
+	} else {
+		//	从args中获取flow_id,process_id
+		flow_id := args[0].(uint)
+		process_id := args[1].(uint)
+		fmt.Println("distribute_plugin execute"+",flow_id:", flow_id, ",process_id:", process_id)
+	}
 	return nil
 }

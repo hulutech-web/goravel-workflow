@@ -523,7 +523,10 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 		Content:     content,
 		Concurrence: carbon.NewDateTime(carbon.Now()),
 	})
-
+	FlowID := cast.ToUint(proc.FlowID)
+	ProcessID := cast.ToUint(proc.ProcessID)
+	//执行插件的方法
+	w.ExecPluginMethod("DistributePlugin", FlowID, ProcessID)
 	tx.Commit()
 
 	return nil
@@ -604,4 +607,10 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 	ins := NewBaseWorkflow()
 	ins.NotifySendOne(proc.Entry.EmpID)
 
+}
+
+// 执行插件方法
+func (w *Workflow) ExecPluginMethod(plugin_name string, flowID uint, processID uint) error {
+	ctor := GetCollectorIns()
+	return ctor.DoPluginsExec(plugin_name, flowID, processID)
 }
