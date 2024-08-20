@@ -22,13 +22,41 @@ type DistributeRequest struct {
 	Rules     Rule `json:"rules" form:"rules"`
 }
 
-func (r *DistributeController) Bind(ctx http.Context) http.Response {
+// 开发者提交插件信息，产出插件
+func (r *DistributeController) Product(ctx http.Context) http.Response {
 	var distributeRequest DistributeRequest
 	ctx.Request().Bind(&distributeRequest)
-	var distriutepluginConfig DistributePluginConfig
-	err := facades.Orm().Query().Model(&DistributePluginConfig{}).Create(&distriutepluginConfig)
+	var pluginConfig PluginConfig
+	err := facades.Orm().Query().Model(&PluginConfig{}).Create(&pluginConfig)
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(500, "制作成功", err)
+	}
+	return httpfacades.NewResult(ctx).Success("制作成功", pluginConfig)
+}
+
+// 流程绑定插件
+func (r *DistributeController) Bind(ctx http.Context) http.Response {
+	plugin_id := ctx.Request().QueryInt("plugin_id")
+	flow_id := ctx.Request().QueryInt("flow_id")
+	process_id := ctx.Request().QueryInt("process_id")
+	err := facades.Orm().Query().Model(&PluginConfig{}).Create(&PluginConfig{
+		PluginID:  uint(plugin_id),
+		FlowID:    uint(flow_id),
+		ProcessID: uint(process_id),
+	})
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(500, "绑定失败", err)
+	}
+	return httpfacades.NewResult(ctx).Success("绑定成功", "")
+}
+
+// 开发者安装插件
+func (r *DistributeController) Install(ctx http.Context) http.Response {
+	var plugin Plugin
+	ctx.Request().Bind(&plugin)
+	err := facades.Orm().Query().Model(&Plugin{}).Create(&plugin)
 	if err != nil {
 		return httpfacades.NewResult(ctx).Error(500, "创建失败", err)
 	}
-	return httpfacades.NewResult(ctx).Success("创建成功", distriutepluginConfig)
+	return httpfacades.NewResult(ctx).Success("创建成功", "")
 }

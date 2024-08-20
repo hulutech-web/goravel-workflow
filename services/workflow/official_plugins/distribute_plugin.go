@@ -50,7 +50,7 @@ func (t Rule) Value() (driver.Value, error) {
 }
 
 // 分配数量插件配置
-type DistributePluginConfig struct {
+type PluginConfig struct {
 	orm.Model
 	PluginID    uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
 	EntryID     uint `gorm:"column:dept_id;comment:'部门ID'" json:"dept_id" form:"dept_id"`
@@ -71,7 +71,7 @@ type Plugin struct {
 
 func (c *DistributePlugin) AutoMigrate() error {
 	db := BootMS()
-	err := db.AutoMigrate(&Plugin{}, &DistributePluginConfig{})
+	err := db.AutoMigrate(&Plugin{}, &PluginConfig{})
 	if err != nil {
 		db.Create(&Plugin{
 			Name:    "数据二次分配",
@@ -90,7 +90,13 @@ func (c *DistributePlugin) AutoMigrate() error {
 func (c *DistributePlugin) RouteApi(app foundation.Application) {
 	router := app.MakeRoute()
 	distributeCtrl := NewDeptController()
-	router.Post("api/plugin/bind", distributeCtrl.Bind)
+
+	//开发者安装插件
+	router.Post("api/plugin/install", distributeCtrl.Install)
+	//开发者提交插件信息，产出插件
+	router.Post("api/plugin/product", distributeCtrl.Product)
+	//流程绑定插件
+	router.Post("api/flow/bind_plugin", distributeCtrl.Bind)
 }
 
 // 插件执行方法

@@ -41,6 +41,10 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 		"config/workflow.go": app.ConfigPath("workflow.go"),
 	})
 
+	app.Commands([]console.Command{
+		commands.NewPlugin(),
+	})
+
 }
 
 func (receiver *ServiceProvider) Boot(app foundation.Application) {
