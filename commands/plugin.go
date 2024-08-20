@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"fmt"
 	"github.com/goravel/framework/contracts/console"
 	"github.com/goravel/framework/contracts/console/command"
 	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
@@ -39,14 +40,16 @@ func (receiver *Plugin) Handle(ctx console.Context) error {
 		Description: "确认添加吗？",
 		Negative:    "否",
 	}); err != nil && _isOk {
-		official_plugins.GormIns.Create(&official_plugins.Plugin{
+		result := official_plugins.GormIns.Create(&official_plugins.Plugin{
 			Name:        name,
 			Version:     version,
 			Description: description,
 			Author:      author,
 		})
-		ctx.Info("创建成功")
+
+		ctx.Info(fmt.Sprintf("创建成功%d", result.RowsAffected))
 		return err
 	}
+	ctx.Info("创建失败")
 	return nil
 }
