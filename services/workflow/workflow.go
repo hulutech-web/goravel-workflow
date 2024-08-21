@@ -371,7 +371,9 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 		if fklink.Process.ChildFlowID > 0 {
 			// 创建子流程
 			child_entry := models.Entry{}
-			tx.Model(&models.Entry{}).
+			tx.Model(&models.Entry{}).With("Flow").
+				With("Process").With("EnterProcess").
+				With("Emp.Dept").
 				Where("pid=?", proc.Entry.ID).
 				Where("circle=?", proc.Entry.Circle).Find(&child_entry)
 			if child_entry.ID == 0 {
