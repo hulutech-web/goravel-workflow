@@ -106,9 +106,9 @@ func (r *FlowController) Publish(ctx http.Context) http.Response {
 	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", flow_id).First(&flow)
 
 	//如果设置了多个个开始步骤
-	link_starts := []models.Flowlink{}
-	facades.Orm().Query().Model(&models.Flowlink{}).Where("flow_id=?", flow_id).Where("position=?", 0).Find(&link_starts)
-	if len(link_starts) > 1 {
+	process_starts := []models.Process{}
+	facades.Orm().Query().Model(&models.Process{}).Where("flow_id=?", flow_id).Where("position=?", 0).Find(&process_starts)
+	if len(process_starts) > 1 {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "发布失败，只能设置一个开始步骤", nil)
 	}
 	var fkCount1 int64
