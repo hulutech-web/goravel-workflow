@@ -601,7 +601,6 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 		Where("circle=?", proc.Entry.Circle).
 		Where("status=?", 0).Find(&todoProc)
 	todoProc.Status = 1
-	todoProc.Beizhu = "审批人不同意"
 	todoProc.AuditorID = cast.ToInt(emp.ID)
 	todoProc.AuditorName = user.Name
 	todoProc.AuditorDept = user.Dept.DeptName

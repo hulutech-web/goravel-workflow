@@ -23,7 +23,7 @@ type DistributeRequest struct {
 }
 
 // 为流程选择插件
-func (r *DistributeController) SelectPlugins(ctx http.Context) http.Response {
+func (r *DistributeController) ChoosePlugins(ctx http.Context) http.Response {
 	type SelRequest struct {
 		FlowID    int   `json:"flow_id" form:"flow_id"`
 		PluginIDs []int `json:"plugin_ids" form:"plugin_ids"`
