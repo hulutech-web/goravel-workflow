@@ -388,11 +388,12 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			}
 
 			child_flowlink := models.Flowlink{}
-			tx.Model(&models.Flowlink{}).
-				Where("flow_id=?", fklink.Process.ChildFlowID).With("Process").
-				Where("type=?", "Condition").Where("Process", func(query orm.Query) orm.Query {
-				return query.Where("position=?", 0)
-			}).Order("sort ASC").First(&child_flowlink)
+			exec_sql := "SELECT * FROM flowlinks AS f " +
+				"WHERE f.flow_id = (SELECT child_flow_id FROM processes WHERE id = ? AND f.type = 'Condition' " +
+				"AND EXISTS (SELECT * FROM processes AS p WHERE p.id = f.process_id AND p.position = 0) " +
+				"ORDER BY f.sort ASC " +
+				"LIMIT 1;"
+			tx.Raw(exec_sql, fklink.ProcessID).Scan(&child_flowlink)
 			err := w.SetFirstProcessAuditor(child_entry, child_flowlink)
 			if err != nil {
 				tx.Rollback()

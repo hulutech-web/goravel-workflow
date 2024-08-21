@@ -74,9 +74,9 @@ func (s *WorkflowEmpSeeder) Run() error {
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-经理",
 		WorkNo:   "30001",
-		UserID:   7,
 		Password: password,
-		DeptID:   8,
+		DeptID:   4,
+		UserID:   8,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-主管",
