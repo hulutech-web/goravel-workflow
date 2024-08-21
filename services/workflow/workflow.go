@@ -367,7 +367,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 	} else {
 		fklink := models.Flowlink{}
 		tx.Model(&models.Flowlink{}).With("Process").With("NextProcess").Where("process_id=?", proc.ProcessID).
-			Where("type=?", "Condition").First(&fklink)
+			Where("type=?", "Condition").Find(&fklink)
 		if fklink.Process.ChildFlowID > 0 {
 			// 创建子流程
 			child_entry := models.Entry{}
