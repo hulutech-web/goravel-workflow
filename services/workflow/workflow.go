@@ -378,7 +378,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				newChildEntry := models.Entry{}
 				newChildEntry.Title = proc.Entry.Title
 				newChildEntry.FlowID = cast.ToUint(fklink.Process.ChildFlowID)
-				newChildEntry.EmpID = cast.ToUint(emp.ID)
+				newChildEntry.EmpID = cast.ToUint(proc.Entry.EmpID)
 				newChildEntry.Status = 0
 				newChildEntry.Pid = cast.ToInt(proc.Entry.ID)
 				newChildEntry.Circle = proc.Entry.Circle
@@ -395,12 +395,10 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			}).Order("sort ASC").First(&child_flowlink)
 			err := w.SetFirstProcessAuditor(child_entry, child_flowlink)
 			if err != nil {
+				tx.Rollback()
 				return err
 			}
-			child_parent := models.Entry{}
-			tx.Model(&models.Entry{}).Where("id=?", child_entry.Pid).First(&child_parent)
-			child_parent.Child = cast.ToInt(child_entry.ProcessID)
-			tx.Model(&models.Entry{}).Where("id=?", child_parent.ID).Save(&child_parent)
+			tx.Model(&models.Entry{}).Where("id=?", child_entry.Pid).Update("child", child_entry.ProcessID)
 		} else {
 			if fklink.NextProcessID == -1 {
 				//最后一步
