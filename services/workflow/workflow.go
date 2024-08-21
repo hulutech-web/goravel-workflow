@@ -134,7 +134,7 @@ func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Fl
 			entry.ProcessID = cast.ToUint(flowlink.NextProcessID)
 		} else {
 
-			auditor_ids = w.GetProcessAuditorIds(entry, cast.ToInt(flowlink.NextProcessID))
+			auditor_ids = w.GetProcessAuditorIds(entry, cast.ToInt(flowlink.ProcessID))
 			process_id = cast.ToInt(flowlink.ProcessID)
 			process_name = flowlink.Process.ProcessName
 			entry.ProcessID = cast.ToUint(flowlink.ProcessID)
