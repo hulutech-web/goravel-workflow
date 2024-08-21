@@ -352,15 +352,15 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			ins.NotifyNextAuditor(auditor.ID)
 		}
 		procEntry := models.Entry{}
-		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&procEntry)
+		tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).Find(&procEntry)
 		procEntry.ProcessID = cast.ToUint(flowlink.NextProcessID)
 		tx.Model(&models.Entry{}).Where("id=?", procEntry.ID).Save(&procEntry)
 		//判断是否存在父进程
 		if proc.Entry.Pid > 0 {
 			proc2Entry := models.Entry{}
-			tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).FirstOrFail(&proc2Entry)
+			tx.Model(&models.Entry{}).Where("id=?", proc.EntryID).Find(&proc2Entry)
 			partentEntry := models.Entry{}
-			tx.Model(&models.Entry{}).Where("pid=?", proc.ID).FirstOrFail(&partentEntry)
+			tx.Model(&models.Entry{}).Where("pid=?", proc.ID).Find(&partentEntry)
 			partentEntry.Child = flowlink.NextProcessID
 			tx.Model(&models.Entry{}).Where("id=?", partentEntry.ID).Save(&partentEntry)
 		}
@@ -373,7 +373,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			child_entry := models.Entry{}
 			tx.Model(&models.Entry{}).
 				Where("pid=?", proc.Entry.ID).
-				Where("circle=?", proc.Entry.Circle).FirstOrFail(&child_entry)
+				Where("circle=?", proc.Entry.Circle).Find(&child_entry)
 			if child_entry.ID == 0 {
 				newChildEntry := models.Entry{}
 				newChildEntry.Title = proc.Entry.Title
@@ -443,7 +443,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Update(&map_entry)
 
 								var notifyProc models.Proc
-								tx.Model(&models.Proc{}).Where("id=?", proc.ID).With("Emp").FirstOrFail(&notifyProc)
+								tx.Model(&models.Proc{}).Where("id=?", proc.ID).With("Emp").Find(&notifyProc)
 								//通知发起人，审批结束
 								ins := NewBaseWorkflow()
 								ins.NotifySendOne(proc.Entry.EmpID)
@@ -470,7 +470,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					}
 				} else {
 					var notifyProc models.Proc
-					tx.Model(&models.Proc{}).Where("id=?", proc.ID).FirstOrFail(&notifyProc)
+					tx.Model(&models.Proc{}).Where("id=?", proc.ID).Find(&notifyProc)
 				}
 			} else {
 				auditor_ids := w.GetProcessAuditorIds(proc.Entry, fklink.NextProcessID)
@@ -501,7 +501,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				tx.Model(&models.Entry{}).Where("id=?", proc.Entry.ID).Update("process_id", cast.ToUint(fklink.NextProcessID))
 				//	判断是否存在父进程
 				var parentEntry models.Entry
-				tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).FirstOrFail(&parentEntry)
+				tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).Find(&parentEntry)
 				if parentEntry.Pid > 0 {
 					parentEntry.Child = cast.ToInt(fklink.NextProcessID)
 					tx.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
@@ -598,7 +598,7 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 	query.Model(&models.Entry{}).Where("id=?", proc.EntryID).Update("status", -1)
 	if proc.Entry.Pid > 0 {
 		var parentEntry models.Entry
-		query.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).FirstOrFail(&parentEntry)
+		query.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).Find(&parentEntry)
 		parentEntry.Child = proc.ProcessID
 		parentEntry.Status = -1
 		query.Model(&models.Entry{}).Where("id=?", parentEntry.ID).Save(&parentEntry)
