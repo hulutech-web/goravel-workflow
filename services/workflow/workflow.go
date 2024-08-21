@@ -409,6 +409,8 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				"ORDER BY f.sort ASC " +
 				"LIMIT 1);"
 			tx.Raw(exec_sql, fklink.ProcessID).Scan(&child_flowlink)
+			tx.Model(&models.Flowlink{}).Where("id=?", child_flowlink.ID).With("Process").
+				With("NextProcess").Find(&child_flowlink)
 			err := w.SetFirstProcessAuditor(child_entry, child_flowlink)
 			if err != nil {
 				return err
