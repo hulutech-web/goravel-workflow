@@ -255,7 +255,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 	var emp models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).With("Dept").Where("user_id=?", user.ID).Find(&emp)
 	var proc models.Proc
-	tx.Model(&models.Proc{}).With("Entry.Emp.Dept").Where("process_id=?", process_id).
+	tx.Model(&models.Proc{}).With("Entry.Emp.Dept").With("Entry.ParentEntry").Where("process_id=?", process_id).
 		Where("emp_id=?", emp.ID).Where("status=?", 0).Find(&proc)
 	if proc.ID == 0 {
 		return errors.New("未绑定员工，请设置员工绑定")
