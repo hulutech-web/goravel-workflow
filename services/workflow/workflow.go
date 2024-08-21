@@ -251,7 +251,7 @@ func uniqueSlice(slice []int) []int {
 
 // 流转
 func (w *Workflow) Transfer(process_id int, user models.Emp, content string) error {
-	tx, _ := facades.Orm().Query().Begin()
+	tx := facades.Orm().Query()
 	var emp models.Emp
 	facades.Orm().Query().Model(&models.Emp{}).With("Dept").Where("user_id=?", user.ID).First(&emp)
 	var proc models.Proc
@@ -396,7 +396,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			tx.Raw(exec_sql, fklink.ProcessID).Scan(&child_flowlink)
 			err := w.SetFirstProcessAuditor(child_entry, child_flowlink)
 			if err != nil {
-				tx.Rollback()
 				return err
 			}
 			tx.Model(&models.Entry{}).Where("id=?", child_entry.Pid).Update("child", child_entry.ProcessID)
@@ -526,7 +525,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 	ProcessID := cast.ToUint(proc.ProcessID)
 	//执行插件的方法
 	w.ExecPluginMethod("DistributePlugin", FlowID, ProcessID)
-	tx.Commit()
 
 	return nil
 }
