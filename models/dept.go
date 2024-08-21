@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"github.com/goravel/framework/database/orm"
 	"strings"
 )
@@ -15,8 +14,8 @@ type Dept struct {
 	Rank       int    `gorm:"column:rank;not null;default:1" json:"rank" form:"rank"`
 	Html       string `gorm:"column:html;null;default:''" json:"html" form:"html"`
 	Level      int    `gorm:"column:level;null;default:0" json:"level" form:"level"`
-	Director   *Emp   `gorm:"foreignkey:DirectorID" form:"-" json:"-"` // 关联主管
-	Manager    *Emp   `gorm:"foreignkey:ManagerID" form:"-" json:"-"`  // 关联经理
+	Director   *Emp   `gorm:"foreignkey:DirectorID"` // 关联主管
+	Manager    *Emp   `gorm:"foreignkey:ManagerID"`  // 关联经理
 }
 
 func (d *Dept) Recursion(models []Dept, html string, pid uint, level int) []Dept {
@@ -25,7 +24,6 @@ func (d *Dept) Recursion(models []Dept, html string, pid uint, level int) []Dept
 		if dept.Pid == pid {
 			dept.Html = strings.Repeat(html, level)
 			dept.Level = level + 1
-			fmt.Printf("Processing: %s, Pid: %d, Html: %s, Level: %d\n", dept.DeptName, dept.Pid, dept.Html, dept.Level)
 			result = append(result, dept)
 			result = append(result, d.Recursion(append([]Dept{}, models[i+1:]...), html, dept.ID, level+1)...)
 		}
