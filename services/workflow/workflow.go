@@ -102,7 +102,7 @@ func (w *Workflow) SetFirstProcessAuditor(entry models.Entry, flowlink models.Fl
 
 		var auditor_ids []int
 		err := tx.Model(&models.Flowlink{}).Where("type != ?", "Condition").
-			Where("process_id=?", flowlink.ProcessID).First(&myFlowlink)
+			Where("process_id=?", flowlink.ProcessID).Find(&myFlowlink)
 
 		var process_id int
 		var process_name string
@@ -174,7 +174,7 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 	var auditor_ids []int
 	var flowlink models.Flowlink
 	query := facades.Orm().Query()
-	query.Model(&models.Flowlink{}).Where("type = ?", "Sys").Where("process_id=?", next_process_id).First(&flowlink)
+	query.Model(&models.Flowlink{}).Where("type = ?", "Sys").Where("process_id=?", next_process_id).Find(&flowlink)
 	if flowlink.ID > 0 {
 		if flowlink.Auditor == "-1000" {
 			//发起人
@@ -198,7 +198,7 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 		//	concurrent 并行
 		//	1、指定员工
 		concurrent_emp_flowlink := models.Flowlink{}
-		query.Model(&models.Flowlink{}).Where("type = ?", "Emp").Where("process_id=?", next_process_id).First(&concurrent_emp_flowlink)
+		query.Model(&models.Flowlink{}).Where("type = ?", "Emp").Where("process_id=?", next_process_id).Find(&concurrent_emp_flowlink)
 		if concurrent_emp_flowlink.ID > 0 {
 			Auditor_ids := []string{}
 			//按照,分割concurrent_flowlink.Auditor
@@ -210,7 +210,7 @@ func (w *Workflow) GetProcessAuditorIds(entry models.Entry, next_process_id int)
 		//	2、指定部门（指定部门时，可能指定多个部门，分别找到部门的主管，并找到对应的emp_id）
 		concurrent_dept_flowlink := models.Flowlink{}
 		query.Model(&models.Flowlink{}).Where("type = ?", "Dept").Where("process_id=?", next_process_id).
-			First(&concurrent_dept_flowlink)
+			Find(&concurrent_dept_flowlink)
 
 		if concurrent_dept_flowlink.ID > 0 {
 			dept_id_strs := []string{}
@@ -253,10 +253,10 @@ func uniqueSlice(slice []int) []int {
 func (w *Workflow) Transfer(process_id int, user models.Emp, content string) error {
 	tx := facades.Orm().Query()
 	var emp models.Emp
-	facades.Orm().Query().Model(&models.Emp{}).With("Dept").Where("user_id=?", user.ID).First(&emp)
+	facades.Orm().Query().Model(&models.Emp{}).With("Dept").Where("user_id=?", user.ID).Find(&emp)
 	var proc models.Proc
 	tx.Model(&models.Proc{}).With("Entry.Emp.Dept").Where("process_id=?", process_id).
-		Where("emp_id=?", emp.ID).Where("status=?", 0).First(&proc)
+		Where("emp_id=?", emp.ID).Where("status=?", 0).Find(&proc)
 	if proc.ID == 0 {
 		return errors.New("未绑定员工，请设置员工绑定")
 	}
@@ -266,7 +266,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 	if fkcount > 1 {
 		//	情况一：有条件
 		pvar := models.ProcessVar{}
-		tx.Model(&models.ProcessVar{}).Where("process_id=?", process_id).First(&pvar)
+		tx.Model(&models.ProcessVar{}).Where("process_id=?", process_id).Find(&pvar)
 		var field_value string
 		tx.Model(&models.EntryData{}).Select("field_value").
 			Where("entry_id=?", proc.EntryID).
@@ -321,7 +321,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 			return errors.New("未找到符合条件的流转条件，无法流转")
 		}
 		var withFlowlink models.Flowlink
-		facades.Orm().Query().Model(&models.Flowlink{}).With("NextProcess").Where("id=?", flowlink.ID).First(&withFlowlink)
+		facades.Orm().Query().Model(&models.Flowlink{}).With("NextProcess").Where("id=?", flowlink.ID).Find(&withFlowlink)
 		auditor_ids := w.GetProcessAuditorIds(proc.Entry, withFlowlink.NextProcessID)
 		if len(auditor_ids) == 0 {
 			return errors.New("未找到下一步骤审批人")
@@ -426,7 +426,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					if proc.Entry.EnterProcess.ChildAfter == 1 {
 						//同时结束父流程
 						parentEntry := models.Entry{}
-						tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).First(&parentEntry)
+						tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).Find(&parentEntry)
 						map_entry := make(map[string]interface{})
 						map_entry["status"] = 9
 						map_entry["child"] = 0
@@ -446,10 +446,10 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 							//默认进入父流程步骤下一步
 							parentFlowlink := models.Flowlink{}
 							tx.Model(&models.Flowlink{}).Where("process_id=?", proc.Entry.EnterProcessID).
-								Where("type=?", "Condition").First(&parentFlowlink)
+								Where("type=?", "Condition").Find(&parentFlowlink)
 							if parentFlowlink.NextProcessID == -1 {
 								parentEntry := models.Entry{}
-								tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).First(&parentEntry)
+								tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).Find(&parentEntry)
 								map_entry := make(map[string]interface{})
 								map_entry["process_id"] = cast.ToUint(proc.Entry.EnterProcess.ChildBackProcess)
 								map_entry["status"] = 9
@@ -465,7 +465,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 								w.goToProcess(*proc.Entry.ParentEntry, parentFlowlink.NextProcessID)
 								proc.Entry.ParentEntry.ProcessID = cast.ToUint(parentFlowlink.NextProcessID)
 								parentEntry := models.Entry{}
-								tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).First(&parentEntry)
+								tx.Model(&models.Entry{}).Where("id=?", proc.Entry.Pid).Find(&parentEntry)
 								map_entry := make(map[string]interface{})
 								map_entry["process_id"] = parentFlowlink.NextProcessID
 								map_entry["status"] = 0
@@ -476,7 +476,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 							}
 						}
 						pentry := models.Entry{}
-						tx.Model(&models.Entry{}).Where("id=?", proc.Entry.ParentEntry.ID).First(&pentry)
+						tx.Model(&models.Entry{}).Where("id=?", proc.Entry.ParentEntry.ID).Find(&pentry)
 						map_entry := make(map[string]interface{})
 						map_entry["child"] = 0
 						tx.Model(&models.Entry{}).Where("id=?", pentry.ID).Save(&map_entry)
@@ -590,14 +590,14 @@ func (w *Workflow) UnPass(proc_id int, user models.Emp, content string) {
 	var proc models.Proc
 	query := facades.Orm().Query()
 	var emp models.Emp
-	query.Model(&models.Emp{}).Where("user_id=?", user.ID).First(&emp)
-	query.Model(&models.Proc{}).Where("id=?", proc_id).With("Entry").First(&proc)
+	query.Model(&models.Emp{}).Where("user_id=?", user.ID).Find(&emp)
+	query.Model(&models.Proc{}).Where("id=?", proc_id).With("Entry").Find(&proc)
 	todoProc := models.Proc{}
 	query.Model(&models.Proc{}).
 		Where("entry_id=?", proc.EntryID).
 		Where("process_id=?", proc.ProcessID).
 		Where("circle=?", proc.Entry.Circle).
-		Where("status=?", 0).First(&todoProc)
+		Where("status=?", 0).Find(&todoProc)
 	todoProc.Status = 1
 	todoProc.Beizhu = "审批人不同意"
 	todoProc.AuditorID = cast.ToInt(emp.ID)
