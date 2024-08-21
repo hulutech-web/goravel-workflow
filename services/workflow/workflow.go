@@ -375,7 +375,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 				Where("pid=?", proc.Entry.ID).
 				Where("circle=?", proc.Entry.Circle).Find(&child_entry)
 			if child_entry.ID == 0 {
-				tx.Model(&models.Entry{}).Create(&models.Entry{
+				new_child_entry := models.Entry{
 					Title:          proc.Entry.Title,
 					FlowID:         cast.ToUint(fklink.Process.ChildFlowID),
 					EmpID:          cast.ToUint(proc.Entry.EmpID),
@@ -384,7 +384,20 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 					Circle:         proc.Entry.Circle,
 					EnterProcessID: cast.ToInt(fklink.ProcessID),
 					EnterProcID:    cast.ToInt(proc.ID),
-				})
+				}
+				tx.Model(&models.Entry{}).Create(&new_child_entry)
+				/**
+				Flow
+				Emp
+				Process
+				EnterProcess
+				*/
+				tx.Model(&models.Entry{}).Where("id=?", new_child_entry.ID).
+					With("Flow").
+					With("Process").With("EnterProcess").
+					With("Emp.Dept").
+					Find(&new_child_entry)
+				child_entry = new_child_entry
 			}
 
 			child_flowlink := models.Flowlink{}
