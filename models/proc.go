@@ -34,27 +34,27 @@ type Proc struct {
 
 // LoadEmp preloads the associated Emp for a Proc.
 func (p *Proc) LoadEmp(db *gorm.DB) error {
-	return db.Preload("Emp").First(p).Error
+	return db.Preload("Emp").Find(p).Error
 }
 
 // LoadEntry preloads the associated Entry for a Proc.
 func (p *Proc) LoadEntry(db *gorm.DB) error {
-	return db.Preload("Entry").First(p).Error
+	return db.Preload("Entry").Find(p).Error
 }
 
 // LoadProcess preloads the associated Process for a Proc.
 func (p *Proc) LoadProcess(db *gorm.DB) error {
-	return db.Preload("Process").First(p).Error
+	return db.Preload("Process").Find(p).Error
 }
 
 // LoadFlow preloads the associated Flow for a Proc.
 func (p *Proc) LoadFlow(db *gorm.DB) error {
-	return db.Preload("Flow").First(p).Error
+	return db.Preload("Flow").Find(p).Error
 }
 
 // LoadSubProcs preloads the associated SubProcs (child processes) for a Proc.
 func (p *Proc) LoadSubProcs(db *gorm.DB) error {
 	return db.Preload("SubProcs", func(db *gorm.DB) *gorm.DB {
 		return db.Select("id", "entry_id") // Optionally select specific fields.
-	}).First(p).Error
+	}).Find(p).Error
 }

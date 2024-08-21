@@ -44,7 +44,7 @@ func (r *ProcController) UnPass(ctx http.Context) http.Response {
 	var user models.Emp
 	facades.Auth(ctx).User(&user)
 	withUser := models.Emp{}
-	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", user.ID).With("Dept").First(&withUser)
+	facades.Orm().Query().Model(&models.Emp{}).Where("id=?", user.ID).With("Dept").Find(&withUser)
 	proc_id := ctx.Request().InputInt("proc_id")
 	content := ctx.Request().Input("content")
 

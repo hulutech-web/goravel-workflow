@@ -18,5 +18,5 @@ func (e *ProcessVar) TableName() string {
 }
 
 func (p *ProcessVar) LoadProcess(db *gorm.DB) error {
-	return db.Preload("Process").First(p).Error
+	return db.Preload("Process").Find(p).Error
 }

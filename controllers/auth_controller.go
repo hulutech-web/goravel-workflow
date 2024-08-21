@@ -37,7 +37,7 @@ func (r *AuthController) AdminLogin(ctx http.Context) http.Response {
 		})
 	}
 	//手机号密码验证
-	facades.Orm().Query().Model(&user).Where("workno", user.WorkNo).First(&user)
+	facades.Orm().Query().Model(&user).Where("workno", user.WorkNo).Find(&user)
 
 	if user.ID == 0 {
 		ctx.Request().AbortWithStatusJson(401, http.Json{
@@ -47,7 +47,7 @@ func (r *AuthController) AdminLogin(ctx http.Context) http.Response {
 		return nil
 	}
 	var user_exist models.Emp
-	facades.Orm().Query().Model(&user_exist).Where("workno=?", user.WorkNo).First(&user_exist)
+	facades.Orm().Query().Model(&user_exist).Where("workno=?", user.WorkNo).Find(&user_exist)
 	//解密
 	//if user_exist.ID != 1 {
 	//	return ctx.Response().Status(http.StatusInternalServerError).Json(http.Json{
@@ -102,7 +102,7 @@ func (r *AuthController) H5Login(ctx http.Context) http.Response {
 		})
 	}
 	//手机号密码验证
-	facades.Orm().Query().Model(&user).Where("workno", user.WorkNo).First(&user)
+	facades.Orm().Query().Model(&user).Where("workno", user.WorkNo).Find(&user)
 
 	if user.ID == 0 {
 		ctx.Request().AbortWithStatusJson(401, http.Json{
@@ -112,7 +112,7 @@ func (r *AuthController) H5Login(ctx http.Context) http.Response {
 		return nil
 	}
 	var user_exist models.Emp
-	facades.Orm().Query().Model(&user_exist).Where("workno", user.WorkNo).First(&user_exist)
+	facades.Orm().Query().Model(&user_exist).Where("workno", user.WorkNo).Find(&user_exist)
 	//解密
 	if user_exist.ID != 1 {
 		return ctx.Response().Status(http.StatusInternalServerError).Json(http.Json{
@@ -161,7 +161,7 @@ func (r *AuthController) Login(ctx http.Context) http.Response {
 		})
 		return nil
 	}
-	facades.Orm().Query().Model(&models.Emp{}).Where("mobile=?", mobile).First(&user)
+	facades.Orm().Query().Model(&models.Emp{}).Where("mobile=?", mobile).Find(&user)
 	if user.ID == 0 {
 		ctx.Request().AbortWithStatusJson(500, http.Json{
 			"error": "用户不存在,请点击注册",

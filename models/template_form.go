@@ -23,5 +23,5 @@ func (p *TemplateForm) TableName() string {
 	return "templateforms"
 }
 func (p *TemplateForm) LoadTemplateForm(db *gorm.DB) error {
-	return db.Preload("Template").First(p).Error
+	return db.Preload("Template").Find(p).Error
 }

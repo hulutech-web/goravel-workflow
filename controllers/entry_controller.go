@@ -29,7 +29,7 @@ func (r *EntryController) Create(ctx http.Context) http.Response {
 	flow_id := ctx.Request().RouteInt("id")
 	var flow models.Flow
 	facades.Orm().Query().Model(&models.Flow{}).Where("id", flow_id).
-		With("Template.TemplateForms").First(&flow)
+		With("Template.TemplateForms").Find(&flow)
 	return httpfacades.NewResult(ctx).Success("", flow)
 }
 
@@ -40,7 +40,7 @@ func (r *EntryController) Index(ctx http.Context) http.Response {
 func (r *EntryController) Show(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	var entry models.Entry
-	facades.Orm().Query().Model(&models.Entry{}).With("EntryDatas").With("Flow.Template.TemplateForms").Where("id", id).First(&entry)
+	facades.Orm().Query().Model(&models.Entry{}).With("EntryDatas").With("Flow.Template.TemplateForms").Where("id", id).Find(&entry)
 	return httpfacades.NewResult(ctx).Success("", entry)
 }
 
@@ -48,7 +48,7 @@ func (r *EntryController) EntryData(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	var entrydata []models.EntryData
 	var entry models.Entry
-	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", id).First(&entry)
+	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", id).Find(&entry)
 	facades.Orm().Query().Model(&models.EntryData{}).Find(&entrydata)
 	return httpfacades.NewResult(ctx).Success("", http.Json{
 		"entry":     entry,
@@ -64,7 +64,7 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 
 	flowlink := models.Flowlink{}
 	facades.Orm().Query().Table("flowlinks").Where("flowlinks.flow_id=?", cast.ToUint(flow_id)).Where("flowlinks.type=?", "Condition").Join("left join processes on flowlinks.id=processes.id").
-		Where("processes.position=?", 0).Order("sort  ASC").First(&flowlink)
+		Where("processes.position=?", 0).Order("sort  ASC").Find(&flowlink)
 	dbSql := fmt.Sprintf("SELECT * "+
 		"FROM `flowlinks` "+
 		"WHERE `flow_id` = %d "+
@@ -80,7 +80,7 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 	facades.Orm().Query().Raw(dbSql).Scan(&flowlink)
 	var withFlowlink models.Flowlink
 	facades.Orm().Query().Model(&models.Flowlink{}).Where("id=?", flowlink.ID).
-		With("Process").With("NextProcess").First(&withFlowlink)
+		With("Process").With("NextProcess").Find(&withFlowlink)
 	//校验提交的数据
 	validRule, validMsg := r.dynamicValidator.DynamicValidate(flow_id)
 	validator, err := facades.Validation().Make(r.dynamicValidator.DynamicValidateField(ctx), validRule, validation.Messages(validMsg))
@@ -101,7 +101,7 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 
 	var withEntry models.Entry
 	query.Model(&models.Entry{}).Where("id=?", entry.ID).With("Flow").With("Emp.Dept").With("Procs").With("EnterProcess").
-		First(&withEntry)
+		Find(&withEntry)
 	//进程初始化
 	//第一步看是否指定审核人
 
@@ -159,11 +159,11 @@ func (r *EntryController) Resend(ctx http.Context) http.Response {
 	entry := models.Entry{}
 	query := facades.Orm().Query()
 	query.Model(&models.Entry{}).Where("id=?", entry_id).Where("status=?", -1).With("Flow").With("Emp.Dept").With("Procs").With("EnterProcess").
-		First(&entry)
+		Find(&entry)
 
 	flow := models.Flow{}
 
-	query.Model(&models.Flow{}).Where("id=?", entry.FlowID).Where("is_publish=?", true).First(&flow)
+	query.Model(&models.Flow{}).Where("id=?", entry.FlowID).Where("is_publish=?", true).Find(&flow)
 	if flow.ID == 0 {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "流程未发布，请检查", "")
 	}
@@ -177,7 +177,7 @@ func (r *EntryController) Resend(ctx http.Context) http.Response {
 	}
 	var withFlowlink models.Flowlink
 	facades.Orm().Query().Model(&models.Flowlink{}).Where("id=?", flowlink.ID).
-		With("Process").With("NextProcess").First(&withFlowlink)
+		With("Process").With("NextProcess").Find(&withFlowlink)
 	//零值更新
 	var map_entry = make(map[string]interface{})
 	map_entry["circle"] = entry.Circle + 1
@@ -185,7 +185,7 @@ func (r *EntryController) Resend(ctx http.Context) http.Response {
 	map_entry["status"] = 0
 	query.Model(&models.Entry{}).Where("id=?", entry.ID).Update(map_entry)
 	newEntry := models.Entry{}
-	query.Model(&models.Entry{}).Where("id=?", entry.ID).With("Flow").With("Emp.Dept").With("Procs").With("EnterProcess").First(&newEntry)
+	query.Model(&models.Entry{}).Where("id=?", entry.ID).With("Flow").With("Emp.Dept").With("Procs").With("EnterProcess").Find(&newEntry)
 
 	err := r.workflow.SetFirstProcessAuditor(newEntry, withFlowlink)
 	if err != nil {

@@ -23,7 +23,7 @@ func (r *HomeController) Index(ctx http.Context) http.Response {
 	user := models.Emp{}
 	facades.Auth(ctx).User(&user)
 	emp := models.Emp{}
-	facades.Orm().Query().Model(&models.Emp{}).Where("user_id=?", user.ID).First(&emp)
+	facades.Orm().Query().Model(&models.Emp{}).Where("user_id=?", user.ID).Find(&emp)
 	query := facades.Orm().Query()
 	//我的申请
 	query.Model(&models.Entry{}).With("Emp").With("Flow").With("Procs", func(q orm.Query) orm.Query {

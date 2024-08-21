@@ -21,13 +21,13 @@ type Flowlink struct {
 }
 
 func (fl *Flowlink) LoadProcess(db *gorm.DB) error {
-	return db.Preload("Process").First(fl).Error
+	return db.Preload("Process").Find(fl).Error
 }
 
 func (fl *Flowlink) LoadProcesses(db *gorm.DB) error {
-	return db.Preload("Processes").First(fl).Error
+	return db.Preload("Processes").Find(fl).Error
 }
 
 func (fl *Flowlink) LoadNextProcess(db *gorm.DB) error {
-	return db.Preload("NextProcess").First(fl).Error
+	return db.Preload("NextProcess").Find(fl).Error
 }

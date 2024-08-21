@@ -46,7 +46,7 @@ func (r *FlowlinkController) Update(ctx http.Context) http.Response {
 	for _, node := range jsMap.List {
 		//	1-更新process
 		var process models.Process
-		tx.Model(&models.Process{}).Where("id=?", node.ID).First(&process)
+		tx.Model(&models.Process{}).Where("id=?", node.ID).Find(&process)
 		style := node.Style
 		process.Style = style
 		//"width:128px;height:30px;line-height:30px;color:#FF8C00;left:461px;top:84px;"使用一个正则匹配到left:461px;top:84px;

@@ -29,7 +29,7 @@ func (r *TemplateformController) Index(ctx http.Context) http.Response {
 func (r *TemplateformController) Show(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	var templateform models.TemplateForm
-	facades.Orm().Query().Model(&models.TemplateForm{}).Where("id=?", id).First(&templateform)
+	facades.Orm().Query().Model(&models.TemplateForm{}).Where("id=?", id).Find(&templateform)
 	return httpfacades.NewResult(ctx).Success("", templateform)
 }
 
@@ -87,7 +87,7 @@ func (r *TemplateformController) Update(ctx http.Context) http.Response {
 	}
 
 	existTpform := models.TemplateForm{}
-	facades.Orm().Query().Model(&models.TemplateForm{}).Where("id=?", id).First(&existTpform)
+	facades.Orm().Query().Model(&models.TemplateForm{}).Where("id=?", id).Find(&existTpform)
 	existTpform.TemplateID = templateformRequest.TemplateID
 	existTpform.Field = templateformRequest.Field
 	existTpform.FieldName = templateformRequest.FieldName

@@ -23,20 +23,20 @@ type Flow struct {
 
 // LoadProcesses preloads the associated Processes for a Flow.
 func (f *Flow) LoadProcesses(db *gorm.DB) error {
-	return db.Preload("Processes").First(f).Error
+	return db.Preload("Processes").Find(f).Error
 }
 
 // LoadProcessVars preloads the associated ProcessVars for a Flow.
 func (f *Flow) LoadProcessVars(db *gorm.DB) error {
-	return db.Preload("ProcessVars").First(f).Error
+	return db.Preload("ProcessVars").Find(f).Error
 }
 
 // LoadTemplate preloads the associated Template for a Flow.
 func (f *Flow) LoadTemplate(db *gorm.DB) error {
-	return db.Preload("Template").First(f).Error
+	return db.Preload("Template").Find(f).Error
 }
 
 // LoadFlowType preloads the associated FlowType for a Flow.
 func (f *Flow) LoadFlowType(db *gorm.DB) error {
-	return db.Preload("FlowType").First(f).Error
+	return db.Preload("FlowType").Find(f).Error
 }

@@ -30,9 +30,9 @@ type Process struct {
 
 // LoadEmp preloads the associated Emp for a Proc.
 func (p *Process) LoadFlow(db *gorm.DB) error {
-	return db.Preload("Flow").First(p).Error
+	return db.Preload("Flow").Find(p).Error
 }
 
 func (p *Process) LoadProcessVars(db *gorm.DB) error {
-	return db.Preload("Processvars").First(p).Error
+	return db.Preload("Processvars").Find(p).Error
 }

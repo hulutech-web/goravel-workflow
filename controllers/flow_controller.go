@@ -95,7 +95,7 @@ func (r *FlowController) Destroy(ctx http.Context) http.Response {
 func (r *FlowController) FlowDesign(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	flow := models.Flow{}
-	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", id).First(&flow)
+	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", id).Find(&flow)
 	return httpfacades.NewResult(ctx).Success("", flow)
 }
 
@@ -103,7 +103,7 @@ func (r *FlowController) FlowDesign(ctx http.Context) http.Response {
 func (r *FlowController) Publish(ctx http.Context) http.Response {
 	flow_id := ctx.Request().InputInt("flow_id")
 	flow := models.Flow{}
-	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", flow_id).First(&flow)
+	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", flow_id).Find(&flow)
 
 	//如果设置了多个个开始步骤
 	process_starts := []models.Process{}

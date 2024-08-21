@@ -13,5 +13,5 @@ type Flowtype struct {
 
 // LoadFlowsForType preloads the associated Flows for a FlowType.
 func (ft *Flowtype) LoadFlowsForType(db *gorm.DB) error {
-	return db.Preload("Flows").First(ft).Error
+	return db.Preload("Flows").Find(ft).Error
 }

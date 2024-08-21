@@ -19,9 +19,9 @@ func NewDynamicValidator() *DynamicValidator {
 
 func (r *DynamicValidator) DynamicValidate(flow_id int) (map[string]string, map[string]string) {
 	var flow models.Flow
-	facades.Orm().Query().Model(&models.Flow{}).Where("id", flow_id).First(&flow)
+	facades.Orm().Query().Model(&models.Flow{}).Where("id", flow_id).Find(&flow)
 	template := models.Template{}
-	facades.Orm().Query().Model(&models.Template{}).Where("id=?", flow.TemplateID).First(&template)
+	facades.Orm().Query().Model(&models.Template{}).Where("id=?", flow.TemplateID).Find(&template)
 	if template.ID == 0 {
 		return make(map[string]string), nil
 	}
