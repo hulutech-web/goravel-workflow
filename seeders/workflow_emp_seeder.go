@@ -38,37 +38,37 @@ func (s *WorkflowEmpSeeder) Run() error {
 		Name:     "技术部-技术主管",
 		WorkNo:   "10002",
 		DeptID:   2,
-		Password: password,
 		UserID:   3,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "技术部-技术员",
 		WorkNo:   "10003",
 		DeptID:   2,
-		Password: password,
 		UserID:   4,
+		Password: password,
 	})
 	//3-财务部
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "财务部-经理",
 		WorkNo:   "20001",
 		DeptID:   3,
-		Password: password,
 		UserID:   5,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "财务部-主管",
 		WorkNo:   "20002",
 		DeptID:   3,
-		Password: password,
 		UserID:   6,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "财务部-财务员",
 		WorkNo:   "20003",
 		DeptID:   3,
-		Password: password,
 		UserID:   7,
+		Password: password,
 	})
 	// 4-市场部
 	query.Model(&emp).Create(&models.Emp{
@@ -82,59 +82,59 @@ func (s *WorkflowEmpSeeder) Run() error {
 		Name:     "市场部-主管",
 		WorkNo:   "30002",
 		DeptID:   4,
-		Password: password,
 		UserID:   9,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-总部员工1",
 		WorkNo:   "30003",
 		DeptID:   4,
-		Password: password,
 		UserID:   10,
+		Password: password,
 	})
 	//4-1市场部-销售部
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-销售部-经理",
 		WorkNo:   "30011",
 		DeptID:   5,
-		Password: password,
 		UserID:   11,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-销售部-主管",
 		WorkNo:   "30012",
 		DeptID:   5,
-		Password: password,
 		UserID:   12,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-销售部-员工1",
 		WorkNo:   "30013",
 		DeptID:   5,
-		Password: password,
 		UserID:   13,
+		Password: password,
 	})
 	//4-1市场部-扩展部
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-扩展部-经理",
 		WorkNo:   "30021",
 		DeptID:   6,
-		Password: password,
 		UserID:   14,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-扩展部-主管",
 		WorkNo:   "30022",
 		DeptID:   6,
-		Password: password,
 		UserID:   15,
+		Password: password,
 	})
 	query.Model(&emp).Create(&models.Emp{
 		Name:     "市场部-扩展部-员工1",
 		WorkNo:   "30023",
 		DeptID:   6,
-		Password: password,
 		UserID:   16,
+		Password: password,
 	})
 
 	return nil
