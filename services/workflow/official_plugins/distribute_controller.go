@@ -31,7 +31,8 @@ func (r *DistributeController) ChoosePlugins(ctx http.Context) http.Response {
 	var selRequest SelRequest
 	ctx.Request().Bind(&selRequest)
 	for _, s := range selRequest.PluginIDs {
-		err := facades.Orm().Query().Model(&FlowPlugin{}).Create(&FlowPlugin{
+		err := facades.Orm().Query().Model(&FlowPlugin{}).Where("plugin_id=?", s).
+			Where("flow_id=?", selRequest.FlowID).FirstOrCreate(&FlowPlugin{
 			PluginID: uint(s),
 			FlowID:   uint(selRequest.FlowID),
 		})
