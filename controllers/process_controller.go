@@ -37,7 +37,7 @@ func (r *ProcessController) Store(ctx http.Context) http.Response {
 	tx, _ := facades.Orm().Query().Begin()
 	var process models.Process
 	var flow models.Flow
-	tx.Model(&models.Flow{}).Where("id=?", flow_id).First(&flow)
+	tx.Model(&models.Flow{}).Where("id=?", flow_id).Find(&flow)
 
 	//步骤一
 	process.FlowID = flow_id
@@ -117,7 +117,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	var process models.Process
 	tx, _ := facades.Orm().Query().Begin()
-	err := tx.Model(&models.Process{}).Where("id=?", id).First(&process)
+	err := tx.Model(&models.Process{}).Where("id=?", id).Find(&process)
 	if err != nil {
 		tx.Rollback()
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "流程不存在", nil)
@@ -159,7 +159,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 	}
 	// 同步更新jsplumb json数据
 	var flow models.Flow
-	err = tx.Model(&models.Flow{}).Where("id=?", process.FlowID).With("Template.TemplateForms").First(&flow)
+	err = tx.Model(&models.Flow{}).Where("id=?", process.FlowID).With("Template.TemplateForms").Find(&flow)
 	if err != nil {
 		tx.Rollback()
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "流程不存在", nil)
@@ -244,7 +244,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 	if processRequest.AutoPerson != "0" {
 
 		var fk models.Flowlink
-		tx.Model(&fk).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Sys").First(&fk)
+		tx.Model(&fk).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Sys").Find(&fk)
 		if fk.ID != 0 {
 			fk.Auditor = cast.ToString(processRequest.AutoPerson)
 			_, err := tx.Model(&models.Flowlink{}).Where("id=?", fk.ID).Update("auditor", processRequest.AutoPerson)
@@ -271,7 +271,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 		//指定部门
 		if len(processRequest.RangeDeptIds) > 0 {
 			var fkdept models.Flowlink
-			tx.Model(&fkdept).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Dept").First(&fkdept)
+			tx.Model(&fkdept).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Dept").Find(&fkdept)
 			if fkdept.ID != 0 {
 				//id组成的数组，然后转换为字符串
 				auditor := ""
@@ -299,7 +299,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 		//	指定员工
 		if len(processRequest.RangeEmpIds) > 0 {
 			var fkemp models.Flowlink
-			tx.Model(&fkemp).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Emp").First(&fkemp)
+			tx.Model(&fkemp).Where("flow_id=?", flow.ID).Where("process_id=?", id).Where("type=?", "Emp").Find(&fkemp)
 			if fkemp.ID != 0 {
 				//id组成的数组，然后转换为字符串
 				auditor := ""
@@ -338,7 +338,7 @@ func (r *ProcessController) Destroy(ctx http.Context) http.Response {
 	flow_id := ctx.Request().InputInt("flow_id")
 	var flow models.Flow
 	tx, _ := facades.Orm().Query().Begin()
-	tx.Model(&flow).Where("id=?", flow_id).First(&flow)
+	tx.Model(&flow).Where("id=?", flow_id).Find(&flow)
 	tx.Model(&models.Flowlink{}).Where("flow_id=?", id).Where("id=?", id).Delete(&models.Flowlink{})
 	tx.Model(&models.Flowlink{}).Where("flow_id=?", id).Where("next_process_id=?", id).Update("next_process_id", -1)
 	tx.Model(&models.Process{}).Where("id=?", id).Delete(&models.Process{})
@@ -375,7 +375,7 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 	id := ctx.Request().QueryInt("id")
 	process := models.Process{}
 	tx := facades.Orm().Query()
-	tx.Model(&models.Process{}).Where("id=?", id).First(&process)
+	tx.Model(&models.Process{}).Where("id=?", id).Find(&process)
 
 	//1- //当前步骤的下一步操作
 	next_process := []models.Flowlink{}
@@ -395,7 +395,7 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 	flow := models.Flow{}
 
 	fields := []models.TemplateForm{}
-	tx.Model(&models.Flow{}).Where("id=?", process.FlowID).With("Template").First(&flow)
+	tx.Model(&models.Flow{}).Where("id=?", process.FlowID).With("Template").Find(&flow)
 	if flow.Template.ID != 0 {
 		tfId := flow.Template.ID
 		tx.Model(&models.TemplateForm{}).Where("template_id=?", tfId).Find(&fields)
@@ -405,7 +405,7 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 	select_emps := []models.Emp{}
 	auditor_emp_flowlink := models.Flowlink{}
 	tx.Model(&models.Flowlink{}).Where("process_id=?", process.ID).
-		Where("type=?", "Emp").Select("auditor").First(&auditor_emp_flowlink)
+		Where("type=?", "Emp").Select("auditor").Find(&auditor_emp_flowlink)
 	//depts按照,拆分
 	empsSlice := []string{}
 	for _, emp := range strings.Split(auditor_emp_flowlink.Auditor, ",") {
@@ -416,7 +416,7 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 	flowlink := models.Flowlink{}
 	sys := "0"
 	tx.Model(&models.Flowlink{}).Where("process_id = ?", process.ID).Where("flow_id=?", process.FlowID).
-		Where("type=?", "Sys").First(&flowlink)
+		Where("type=?", "Sys").Find(&flowlink)
 	if flowlink.Auditor != "" {
 		sys = flowlink.Auditor
 	}
@@ -425,7 +425,7 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 	select_depts := []models.Dept{}
 	auditor_dept_flowlink := models.Flowlink{}
 	tx.Model(&models.Flowlink{}).Where("type=?", "Dept").Where("process_id=?", process.ID).
-		Select("auditor").First(&auditor_dept_flowlink)
+		Select("auditor").Find(&auditor_dept_flowlink)
 	//depts按照,拆分
 	deptsSlice := []string{}
 	for _, dept := range strings.Split(auditor_dept_flowlink.Auditor, ",") {
@@ -468,9 +468,9 @@ func (r *ProcessController) Condition(ctx http.Context) http.Response {
 	flowlink := models.Flowlink{}
 	tx, _ := facades.Orm().Query().Begin()
 	tx.Model(&models.Flowlink{}).Where("process_id=?", process_id).Where("next_process_id=?", next_process_id).
-		Where("flow_id=?", flow_id).Where("type=?", "Condition").FirstOrFail(&flowlink)
+		Where("flow_id=?", flow_id).Where("type=?", "Condition").FindOrFail(&flowlink)
 	flow := models.Flow{}
-	tx.Model(&models.Flow{}).With("Template.TemplateForms").Where("id=?", flow_id).First(&flow)
+	tx.Model(&models.Flow{}).With("Template.TemplateForms").Where("id=?", flow_id).Find(&flow)
 	//$day > 3  AND
 	// $sex == 女
 	fieldsArr := []string{}

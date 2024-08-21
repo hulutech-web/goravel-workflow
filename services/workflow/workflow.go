@@ -503,7 +503,6 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 						ProcessName: fklink.NextProcess.ProcessName,
 						EmpID:       cast.ToInt(auditor.ID),
 						EmpName:     auditor.Name,
-						AuditorID:   cast.ToInt(auditor.ID),
 						Content:     content,
 						DeptName:    auditor.Dept.DeptName,
 						Circle:      proc.Entry.Circle,
