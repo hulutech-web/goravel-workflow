@@ -9,6 +9,7 @@ import (
 	"github.com/goravel/framework/support/carbon"
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
+	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
 	"github.com/spf13/cast"
 	"reflect"
 	"strings"
@@ -526,6 +527,11 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 		}
 	}
 
+	var plugin_configs []official_plugins.PluginConfig
+	tx.Model(official_plugins.PluginConfig{}).Where("process_id=?", process_id).Find(&plugin_configs)
+	//plugin_configs 使用json转换为string类型
+	plugin_configs_str, _ := json.Marshal(plugin_configs)
+
 	tx.Model(&models.Proc{}).
 		Where("entry_id=?", proc.EntryID).
 		Where("process_id=?", proc.ProcessID).
@@ -536,6 +542,7 @@ func (w *Workflow) Transfer(process_id int, user models.Emp, content string) err
 		AuditorName: emp.Name,
 		DeptName:    emp.Dept.DeptName,
 		Content:     content,
+		Beizhu:      string(plugin_configs_str),
 		Concurrence: carbon.NewDateTime(carbon.Now()),
 	})
 	FlowID := cast.ToUint(proc.FlowID)
