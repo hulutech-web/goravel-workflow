@@ -32,11 +32,18 @@ func (r *DistributeController) InstallPlugin(ctx http.Context) http.Response {
 	var selRequest SelRequest
 	ctx.Request().Bind(&selRequest)
 	var flow models.Flow
-	facades.Orm().Query().Model(&flow).Where("id=?", selRequest.FlowID).Find(&flow)
+	query := facades.Orm().Query()
+	query.Model(&flow).Where("id=?", selRequest.FlowID).Find(&flow)
 	var plugin Plugin
 	facades.Orm().Query().Model(&Plugin{}).Where("id=?", selRequest.PluginID).Find(&plugin)
-
-	facades.Orm().Query().Model(&flow).Association("Plugins").Append(&plugin)
+	if flow.ID == 0 || plugin.ID == 0 {
+		return httpfacades.NewResult(ctx).Error(500, "流程或插件不存在", "")
+	}
+	query.Model(&FlowPlugin{}).Create(&FlowPlugin{
+		FlowID:   uint(selRequest.FlowID),
+		PluginID: uint(selRequest.PluginID),
+	})
+	query.Model(&flow).Association("Plugins").Append(&plugin)
 	return httpfacades.NewResult(ctx).Success("安装成功", "")
 }
 
@@ -59,4 +66,26 @@ func (r *DistributeController) Product(ctx http.Context) http.Response {
 		return httpfacades.NewResult(ctx).Error(500, "制作成功", err)
 	}
 	return httpfacades.NewResult(ctx).Success("制作成功", pluginConfig)
+}
+
+// 卸载插件
+func (r *DistributeController) UninstallPlugin(ctx http.Context) http.Response {
+	type SelRequest struct {
+		FlowID   int `json:"flow_id" form:"flow_id"`
+		PluginID int `json:"plugin_id" form:"plugin_id"`
+	}
+	var selRequest SelRequest
+	ctx.Request().Bind(&selRequest)
+	var flow models.Flow
+	query := facades.Orm().Query()
+	query.Model(&flow).Where("id=?", selRequest.FlowID).Find(&flow)
+	var plugin Plugin
+	facades.Orm().Query().Model(&Plugin{}).Where("id=?", selRequest.PluginID).Find(&plugin)
+	if flow.ID == 0 || plugin.ID == 0 {
+		return httpfacades.NewResult(ctx).Error(500, "流程或插件不存在", "")
+	}
+	query.Model(&FlowPlugin{}).Where("flow_id=?", selRequest.FlowID).Where("plugin_id=?", selRequest.FlowID).
+		Delete(&FlowPlugin{})
+	query.Model(&flow).Association("Plugins").Delete(&plugin)
+	return httpfacades.NewResult(ctx).Success("卸载成功", "")
 }
