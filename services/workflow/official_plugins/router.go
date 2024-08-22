@@ -18,4 +18,5 @@ func (c *DistributePlugin) RouteApi(app foundation.Application) {
 	//5、为某一个流程的某一个步骤中的某一个字段添加插件规则
 	router.Post("api/plugin/store_plugin_config", distributeCtrl.StorePluginConfig)
 	router.Post("api/plugin/get_plugin_config", distributeCtrl.GetPluginConfig)
+	router.Post("api/plugin/getall_plugin_config", distributeCtrl.GetAllPluginConfig)
 }

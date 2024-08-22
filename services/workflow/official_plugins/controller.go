@@ -96,6 +96,24 @@ func (r *DistributeController) GetPluginConfig(ctx http.Context) http.Response {
 	return httpfacades.NewResult(ctx).Success("", pluginConfig)
 }
 
+func (r *DistributeController) GetAllPluginConfig(ctx http.Context) http.Response {
+	type PluginConfigRequest struct {
+		FieldID   int  `json:"field_id" form:"field_id"`
+		FlowID    uint `json:"flow_id" form:"flow_id"`
+		PluginID  uint `json:"plugin_id" form:"plugin_id"`
+		ProcessID uint `json:"process_id" form:"process_id"`
+		Rules     Rule `json:"rules" form:"rules"`
+	}
+	var pluginConfigRequest PluginConfigRequest
+	ctx.Request().Bind(&pluginConfigRequest)
+	var pluginConfig PluginConfig
+	facades.Orm().Query().Model(&PluginConfig{}).
+		Where("flow_id=?", pluginConfigRequest.FlowID).
+		Where("plugin_id=?", pluginConfigRequest.PluginID).
+		Find(&pluginConfig)
+	return httpfacades.NewResult(ctx).Success("", pluginConfig)
+}
+
 // 开发者提交插件信息，通过设计生成插件的选项
 func (r *DistributeController) Product(ctx http.Context) http.Response {
 	var distributeRequest DistributeRequest
