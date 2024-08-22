@@ -28,6 +28,12 @@ func (r *DeptController) Index(ctx http.Context) http.Response {
 	return httpfacades.NewResult(ctx).Success("", result)
 }
 
+func (r *DeptController) List(ctx http.Context) http.Response {
+	depts := []models.Dept{}
+	facades.Orm().Query().Model(&models.Dept{}).Find(&depts)
+	return httpfacades.NewResult(ctx).Success("", depts)
+}
+
 func (r *DeptController) Show(ctx http.Context) http.Response {
 	return nil
 }

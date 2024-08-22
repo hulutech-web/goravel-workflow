@@ -30,6 +30,7 @@ func Api(app foundation.Application) {
 		//	部门
 		deptCtrl := controllers.NewDeptController()
 		router.Resource("dept", deptCtrl)
+		router.Get("dept/list", deptCtrl.List)
 		router.Post("dept/bindmanager", deptCtrl.BindManager)
 		router.Post("dept/binddirector", deptCtrl.BindDirector)
 
