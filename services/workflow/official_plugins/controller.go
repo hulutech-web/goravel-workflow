@@ -106,12 +106,12 @@ func (r *DistributeController) GetAllPluginConfig(ctx http.Context) http.Respons
 	}
 	var pluginConfigRequest PluginConfigRequest
 	ctx.Request().Bind(&pluginConfigRequest)
-	var pluginConfig PluginConfig
+	var pluginConfigs []PluginConfig
 	facades.Orm().Query().Model(&PluginConfig{}).
 		Where("flow_id=?", pluginConfigRequest.FlowID).
 		Where("plugin_id=?", pluginConfigRequest.PluginID).
-		Find(&pluginConfig)
-	return httpfacades.NewResult(ctx).Success("", pluginConfig)
+		Find(&pluginConfigs)
+	return httpfacades.NewResult(ctx).Success("", pluginConfigs)
 }
 
 // 开发者提交插件信息，通过设计生成插件的选项
