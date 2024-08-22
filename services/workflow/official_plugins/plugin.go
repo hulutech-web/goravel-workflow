@@ -12,6 +12,7 @@ type Plugin struct {
 	Status        int            `gorm:"column:status;comment:'状态'" json:"status" form:"status"`
 	Description   string         `gorm:"column:description;comment:'描述'" json:"description" form:"description"`
 	Author        string         `gorm:"column:author;comment:'作者'" json:"author" form:"author"`
+	IsDesigned    int            `gorm:"column:is_designed;comment:'是否完成设计'" json:"is_designed" form:"is_designed"`
 	PluginConfigs []PluginConfig `gorm:"foreignKey:PluginID;references:ID"`
 	Flows         []*models.Flow `gorm:"many2many:flow_plugins"`
 }
