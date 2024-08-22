@@ -1,8 +1,6 @@
 package official_plugins
 
 import (
-	"database/sql/driver"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/goravel/framework/facades"
@@ -40,23 +38,6 @@ func (c *DistributePlugin) Action() func(string) error {
 
 func (c *DistributePlugin) AddHook(hook string) {
 	c.HookName = hook
-}
-
-type RuleItem struct {
-	RuleName  string `json:"rule_name" form:"rule_name"`
-	RuleTitle string `json:"rule_title" form:"rule_title"`
-	RuleValue string `json:"rule_value" form:"rule_value"`
-}
-type Rule []RuleItem
-
-func (t *Rule) Scan(value interface{}) error {
-	bytesValue, _ := value.([]byte)
-	return json.Unmarshal(bytesValue, t)
-}
-
-func (t Rule) Value() (driver.Value, error) {
-	//如果t为nil,返回nil
-	return json.Marshal(t)
 }
 
 func (c *DistributePlugin) AutoMigrate() error {

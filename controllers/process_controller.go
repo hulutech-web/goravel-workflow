@@ -26,6 +26,14 @@ func (r *ProcessController) Index(ctx http.Context) http.Response {
 	return nil
 }
 
+func (r *ProcessController) List(ctx http.Context) http.Response {
+	flow_id := ctx.Request().InputInt("flow_id")
+	processes := []models.Process{}
+	facades.Orm().Query().Model(&models.Process{}).
+		Where("flow_id=?", flow_id).With("Flow").Model(&models.Process{}).Find(&processes)
+	return httpfacades.NewResult(ctx).Success("", processes)
+}
+
 func (r *ProcessController) Show(ctx http.Context) http.Response {
 	return nil
 }

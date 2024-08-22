@@ -1,6 +1,8 @@
 package official_plugins
 
 import (
+	"database/sql/driver"
+	"encoding/json"
 	"github.com/goravel/framework/database/orm"
 	"github.com/hulutech-web/goravel-workflow/models"
 )
@@ -24,13 +26,28 @@ type FlowPlugin struct {
 	FlowID   uint `gorm:"column:flow_id;comment:'流程ID'" json:"flow_id" form:"flow_id"`
 }
 
-// 分配数量插件配置
+// 为某一个流程中的某一个步骤添加规则
 type PluginConfig struct {
 	orm.Model
-	PluginID    uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
-	EntryID     uint `gorm:"column:dept_id;comment:'部门ID'" json:"dept_id" form:"dept_id"`
-	FlowID      uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
-	ProcessID   uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
-	EntrydataID uint `gorm:"column:entrydata_id;comment:'输入内容中的哪一个字段'" json:"entrydata_id" form:"entrydata_id"`
-	Rules       Rule `gorm:"column:config" json:"config" form:"config"`
+	PluginID  uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
+	FlowID    uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
+	ProcessID uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
+	Rules     Rule `gorm:"column:rules" json:"config" form:"rules"`
+}
+
+type RuleItem struct {
+	RuleName  string `json:"rule_name" form:"rule_name"`
+	RuleTitle string `json:"rule_title" form:"rule_title"`
+	RuleValue string `json:"rule_value" form:"rule_value"`
+}
+type Rule []RuleItem
+
+func (t *Rule) Scan(value interface{}) error {
+	bytesValue, _ := value.([]byte)
+	return json.Unmarshal(bytesValue, t)
+}
+
+func (t Rule) Value() (driver.Value, error) {
+	//如果t为nil,返回nil
+	return json.Marshal(t)
 }

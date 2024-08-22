@@ -77,6 +77,7 @@ func Api(app foundation.Application) {
 		router.Resource("process", processCtrl)
 		router.Get("process/attribute", processCtrl.Attribute)
 		router.Post("process/con", processCtrl.Condition)
+		router.Post("process/list", processCtrl.List)
 
 		//	审批流转
 		procCtrl := controllers.NewProcController()
