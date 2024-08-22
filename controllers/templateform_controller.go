@@ -108,3 +108,13 @@ func (r *TemplateformController) Destroy(ctx http.Context) http.Response {
 	facades.Orm().Query().Model(&models.TemplateForm{}).Where("id=?", id).Delete(&models.TemplateForm{})
 	return httpfacades.NewResult(ctx).Success("删除成功", nil)
 }
+
+func (r *TemplateformController) FlowTemplateForm(ctx http.Context) http.Response {
+	flow_id := ctx.Request().RouteInt("flow_id")
+	var flow models.Flow
+	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", flow_id).With("Template").Find(&flow)
+	template_id := flow.TemplateID
+	var template_forms []models.TemplateForm
+	facades.Orm().Query().Model(&models.TemplateForm{}).Where("template_id=?", template_id).Find(&template_forms)
+	return httpfacades.NewResult(ctx).Success("", template_forms)
+}

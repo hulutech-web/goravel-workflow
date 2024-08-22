@@ -72,6 +72,7 @@ func Api(app foundation.Application) {
 		router.Put("templateform/{id}", templateformCtrl.Update)
 		router.Delete("templateform/{id}", templateformCtrl.Destroy)
 		router.Get("templateform/{id}", templateformCtrl.Show)
+		router.Post("flow/templateform", templateformCtrl.FlowTemplateForm)
 
 		//	流程
 		processCtrl := controllers.NewProcessController()
