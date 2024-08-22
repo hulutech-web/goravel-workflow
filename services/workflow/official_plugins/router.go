@@ -15,6 +15,7 @@ func (c *DistributePlugin) RouteApi(app foundation.Application) {
 	router.Post("api/flow/uninstall_plugin", distributeCtrl.UninstallPlugin)
 	//4、获取系统中已有的插件
 	router.Get("api/plugin/list", distributeCtrl.List)
-	//5、为某一个流程的某一个步骤添加插件规则
-	router.Post("api/plugin/plugin_config", distributeCtrl.StorePluginConfig)
+	//5、为某一个流程的某一个步骤中的某一个字段添加插件规则
+	router.Post("api/plugin/store_plugin_config", distributeCtrl.StorePluginConfig)
+	router.Post("api/plugin/get_plugin_config", distributeCtrl.GetPluginConfig)
 }

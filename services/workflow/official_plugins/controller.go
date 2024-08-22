@@ -59,14 +59,40 @@ func (r *DistributeController) List(ctx http.Context) http.Response {
 // 添加插件规则
 func (r *DistributeController) StorePluginConfig(ctx http.Context) http.Response {
 	type PluginConfigRequest struct {
+		FieldID   int  `json:"field_id" form:"field_id"`
 		FlowID    uint `json:"flow_id" form:"flow_id"`
+		PluginID  uint `json:"plugin_id" form:"plugin_id"`
 		ProcessID uint `json:"process_id" form:"process_id"`
 		Rules     Rule `json:"rules" form:"rules"`
 	}
 	var pluginConfigRequest PluginConfigRequest
 	ctx.Request().Bind(&pluginConfigRequest)
-	facades.Orm().Query().Model(&PluginConfig{}).Create(&pluginConfigRequest)
-	return httpfacades.NewResult(ctx).Success("添加成功", "")
+	//创建或者更新
+	facades.Orm().Query().UpdateOrCreate(&PluginConfig{}, PluginConfig{
+		PluginID:  pluginConfigRequest.PluginID,
+		FlowID:    pluginConfigRequest.FlowID,
+		ProcessID: pluginConfigRequest.ProcessID,
+		FieldID:   pluginConfigRequest.FieldID,
+	}, PluginConfig{Rules: pluginConfigRequest.Rules})
+	return httpfacades.NewResult(ctx).Success("保存成功", "")
+}
+
+func (r *DistributeController) GetPluginConfig(ctx http.Context) http.Response {
+	type PluginConfigRequest struct {
+		FieldID   int  `json:"field_id" form:"field_id"`
+		FlowID    uint `json:"flow_id" form:"flow_id"`
+		PluginID  uint `json:"plugin_id" form:"plugin_id"`
+		ProcessID uint `json:"process_id" form:"process_id"`
+	}
+	var pluginConfigRequest PluginConfigRequest
+	ctx.Request().Bind(&pluginConfigRequest)
+	var pluginConfig PluginConfig
+	facades.Orm().Query().Model(&PluginConfig{}).
+		Where("field_id=?", pluginConfigRequest.FieldID).
+		Where("flow_id=?", pluginConfigRequest.FlowID).
+		Where("plugin_id=?", pluginConfigRequest.PluginID).
+		Where("process_id=?", pluginConfigRequest.ProcessID).Find(&PluginConfig{})
+	return httpfacades.NewResult(ctx).Success("", pluginConfig)
 }
 
 // 开发者提交插件信息，通过设计生成插件的选项

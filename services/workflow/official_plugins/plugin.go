@@ -32,6 +32,7 @@ type PluginConfig struct {
 	PluginID  uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
 	FlowID    uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
 	ProcessID uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
+	FieldID   int  `gorm:"column:field_id;comment:'对应template_form中的字段field对应的id'" json:"field_id" form:"field_id"`
 	Rules     Rule `gorm:"column:rules" json:"config" form:"rules"`
 }
 
@@ -40,6 +41,7 @@ type RuleItem struct {
 	RuleTitle string `json:"rule_title" form:"rule_title"`
 	RuleValue string `json:"rule_value" form:"rule_value"`
 }
+
 type Rule []RuleItem
 
 func (t *Rule) Scan(value interface{}) error {
