@@ -31,18 +31,26 @@ func (r *DistributeController) ChoosePlugins(ctx http.Context) http.Response {
 	}
 	var selRequest SelRequest
 	ctx.Request().Bind(&selRequest)
+	var flow models.Flow
+	facades.Orm().Query().Model(&flow).Where("id=?", selRequest.FlowID).Find(&flow)
 	for _, plugin_id := range selRequest.PluginIDs {
 		//查找或者替换
 		var plugins []Plugin
 		facades.Orm().Query().Model(&models.Flow{}).Where("id=?", selRequest.FlowID).
 			Association("Plugins").Find(&plugins)
 		if len(plugins) > 0 {
-			//忽略
+			//	替换关联
+			for _, plugin := range plugins {
+				if err := facades.Orm().Query().Model(&flow).
+					Association("Plugins").Replace(&plugin); err != nil {
+					return httpfacades.NewResult(ctx).Error(500, "绑定失败", err)
+				}
+			}
 		} else {
 			//绑定
 			plugin := Plugin{}
 			facades.Orm().Query().Where("id=?", plugin_id).Find(&plugin)
-			facades.Orm().Query().Model(&models.Flow{}).Where("id=?", selRequest.FlowID).
+			facades.Orm().Query().Model(&flow).
 				Association("Plugins").Append(&plugin)
 		}
 	}
