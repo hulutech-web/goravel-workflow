@@ -5,10 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/goravel/framework/contracts/foundation"
-	"github.com/goravel/framework/database/orm"
 	"github.com/goravel/framework/facades"
-	"github.com/hulutech-web/goravel-workflow/models"
 	"sync"
 )
 
@@ -62,35 +59,6 @@ func (t Rule) Value() (driver.Value, error) {
 	return json.Marshal(t)
 }
 
-// 分配数量插件配置
-type PluginConfig struct {
-	orm.Model
-	PluginID    uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
-	EntryID     uint `gorm:"column:dept_id;comment:'部门ID'" json:"dept_id" form:"dept_id"`
-	FlowID      uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
-	ProcessID   uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
-	EntrydataID uint `gorm:"column:entrydata_id;comment:'输入内容中的哪一个字段'" json:"entrydata_id" form:"entrydata_id"`
-	Rules       Rule `gorm:"column:config" json:"config" form:"config"`
-}
-
-type Plugin struct {
-	orm.Model
-	Name          string         `gorm:"column:name;unique;comment:'插件名称'" json:"name" form:"name"`
-	Version       string         `gorm:"column:version;comment:'版本号'" json:"version" form:"version"`
-	Status        int            `gorm:"column:status;comment:'状态'" json:"status" form:"status"`
-	Description   string         `gorm:"column:description;comment:'描述'" json:"description" form:"description"`
-	Author        string         `gorm:"column:author;comment:'作者'" json:"author" form:"author"`
-	PluginConfigs []PluginConfig `gorm:"foreignKey:PluginID;references:ID"`
-	Flow          []*models.Flow `gorm:"many2many:flow_plugins"`
-}
-
-// flow_plugin中间表
-type FlowPlugin struct {
-	orm.Model
-	PluginID uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
-	FlowID   uint `gorm:"column:flow_id;comment:'流程ID'" json:"flow_id" form:"flow_id"`
-}
-
 func (c *DistributePlugin) AutoMigrate() error {
 	err_ := errors.New("distribute_plugin")
 	Once.Do(func() {
@@ -129,20 +97,6 @@ func (c *DistributePlugin) AutoMigrate() error {
 		}
 	})
 	return err_
-}
-
-// 插件路由方法，为节点绑定执行插件
-func (c *DistributePlugin) RouteApi(app foundation.Application) {
-	router := app.MakeRoute()
-	distributeCtrl := NewDeptController()
-
-	//1、命令行新建一个插件
-	//2、开发者通过设计，设计出该插件的一些选项和规则
-	router.Post("api/plugin/product", distributeCtrl.Product)
-	//3、为流程选择某些插件
-	router.Post("api/flow/choose_plugins", distributeCtrl.ChoosePlugins)
-	//4、获取系统中已有的插件
-	router.Get("api/plugin/list", distributeCtrl.List)
 }
 
 // 插件执行方法，当流程执行到某一个流程的某一个节点，会自动调用该执行方法，将数据交给下一级
