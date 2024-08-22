@@ -3,6 +3,7 @@ package official_plugins
 import (
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"github.com/hulutech-web/goravel-workflow/models"
 	httpfacades "github.com/hulutech-web/http_result"
 )
 
@@ -30,16 +31,22 @@ func (r *DistributeController) ChoosePlugins(ctx http.Context) http.Response {
 	}
 	var selRequest SelRequest
 	ctx.Request().Bind(&selRequest)
-	for _, s := range selRequest.PluginIDs {
-		err := facades.Orm().Query().Model(&FlowPlugin{}).Where("plugin_id=?", s).
-			Where("flow_id=?", selRequest.FlowID).FirstOrCreate(&FlowPlugin{
-			PluginID: uint(s),
-			FlowID:   uint(selRequest.FlowID),
-		})
-		if err != nil {
-			return httpfacades.NewResult(ctx).Error(500, "绑定失败", err)
+	for _, plugin_id := range selRequest.PluginIDs {
+		//查找或者替换
+		var plugins []Plugin
+		facades.Orm().Query().Model(&models.Flow{}).Where("id=?", selRequest.FlowID).
+			Association("Plugins").Find(&plugins)
+		if len(plugins) > 0 {
+			//忽略
+		} else {
+			//绑定
+			plugin := Plugin{}
+			facades.Orm().Query().Where("id=?", plugin_id).Find(&plugin)
+			facades.Orm().Query().Model(&models.Flow{}).Where("id=?", selRequest.FlowID).
+				Association("Plugins").Append(&plugin)
 		}
 	}
+
 	return httpfacades.NewResult(ctx).Success("绑定成功", "")
 }
 

@@ -8,6 +8,7 @@ import (
 	"github.com/goravel/framework/contracts/foundation"
 	"github.com/goravel/framework/database/orm"
 	"github.com/goravel/framework/facades"
+	"github.com/hulutech-web/goravel-workflow/models"
 	"sync"
 )
 
@@ -80,6 +81,7 @@ type Plugin struct {
 	Description   string         `gorm:"column:description;comment:'描述'" json:"description" form:"description"`
 	Author        string         `gorm:"column:author;comment:'作者'" json:"author" form:"author"`
 	PluginConfigs []PluginConfig `gorm:"foreignKey:PluginID;references:ID"`
+	Flow          []*models.Flow `gorm:"many2many:flow_plugins"`
 }
 
 // flow_plugin中间表
