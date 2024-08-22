@@ -107,7 +107,7 @@ func (r *DistributeController) GetAllPluginConfig(ctx http.Context) http.Respons
 	var pluginConfigRequest PluginConfigRequest
 	ctx.Request().Bind(&pluginConfigRequest)
 	var pluginConfigs []PluginConfig
-	facades.Orm().Query().Model(&PluginConfig{}).
+	facades.Orm().Query().Model(&PluginConfig{}).With("Flow").With("Process").With("TemplateForm").
 		Where("flow_id=?", pluginConfigRequest.FlowID).
 		Where("plugin_id=?", pluginConfigRequest.PluginID).
 		Find(&pluginConfigs)

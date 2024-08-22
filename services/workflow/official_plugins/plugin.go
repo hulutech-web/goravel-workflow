@@ -29,11 +29,14 @@ type FlowPlugin struct {
 // 为某一个流程中的某一个步骤添加规则
 type PluginConfig struct {
 	orm.Model
-	PluginID  uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
-	FlowID    uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
-	ProcessID uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
-	FieldID   int  `gorm:"column:field_id;comment:'对应template_form中的字段field对应的id'" json:"field_id" form:"field_id"`
-	Rules     Rule `gorm:"column:rules;type:text" json:"config" form:"rules"`
+	PluginID     uint `gorm:"column:plugin_id;comment:'插件ID'" json:"plugin_id" form:"plugin_id"`
+	FlowID       uint `gorm:"column:flow_id" json:"flow_id" form:"flow_id"`
+	ProcessID    uint `gorm:"column:process_id" json:"process_id" form:"process_id"`
+	FieldID      int  `gorm:"column:field_id;comment:'对应template_form中的字段field对应的id'" json:"field_id" form:"field_id"`
+	Rules        Rule `gorm:"column:rules;type:text" json:"config" form:"rules"`
+	Flow         *models.Flow
+	Process      *models.Process
+	TemplateForm *models.TemplateForm `gorm:"foreignKey:FieldID;references:ID"`
 }
 
 type RuleItem struct {
