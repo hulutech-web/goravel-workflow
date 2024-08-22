@@ -8,6 +8,7 @@ import (
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	"github.com/hulutech-web/goravel-workflow/models"
 	"github.com/hulutech-web/goravel-workflow/services/workflow"
+	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
 	httpfacades "github.com/hulutech-web/http_result"
 	"github.com/spf13/cast"
 	"reflect"
@@ -48,11 +49,20 @@ func (r *EntryController) EntryData(ctx http.Context) http.Response {
 	id := ctx.Request().RouteInt("id")
 	var entrydata []models.EntryData
 	var entry models.Entry
-	facades.Orm().Query().Model(&models.Entry{}).Where("id=?", id).Find(&entry)
-	facades.Orm().Query().Model(&models.EntryData{}).Find(&entrydata)
+	query := facades.Orm().Query()
+	query.Model(&models.Entry{}).Where("id=?", id).Find(&entry)
+	query.Model(&models.EntryData{}).Where("entry_id=?", id).Find(&entrydata)
+
+	last_process := models.Process{}
+	query.Model(&models.Flowlink{}).Where("next_process_id=?", entry.ProcessID).
+		Where("type=?", "Condition").Find(&last_process)
+	plugin_configs := official_plugins.PluginConfig{}
+	//找上一个process
+	query.Model(&official_plugins.PluginConfig{}).Where("process_id=?", entry.ProcessID).Find(&plugin_configs)
 	return httpfacades.NewResult(ctx).Success("", http.Json{
-		"entry":     entry,
-		"entrydata": entrydata,
+		"entry":          entry,
+		"entrydata":      entrydata,
+		"plugin_configs": plugin_configs,
 	})
 }
 
