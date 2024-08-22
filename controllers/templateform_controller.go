@@ -110,7 +110,7 @@ func (r *TemplateformController) Destroy(ctx http.Context) http.Response {
 }
 
 func (r *TemplateformController) FlowTemplateForm(ctx http.Context) http.Response {
-	flow_id := ctx.Request().RouteInt("flow_id")
+	flow_id := ctx.Request().InputInt("flow_id")
 	var flow models.Flow
 	facades.Orm().Query().Model(&models.Flow{}).Where("id=?", flow_id).With("Template").Find(&flow)
 	template_id := flow.TemplateID
