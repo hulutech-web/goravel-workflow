@@ -63,7 +63,7 @@ func (r *DistributeController) StorePluginConfig(ctx http.Context) http.Response
 		FlowID    uint `json:"flow_id" form:"flow_id"`
 		PluginID  uint `json:"plugin_id" form:"plugin_id"`
 		ProcessID uint `json:"process_id" form:"process_id"`
-		Rule      Rule `json:"rule" form:"rule"`
+		Rules     Rule `json:"rules" form:"rules"`
 	}
 	var pluginConfigRequest PluginConfigRequest
 	ctx.Request().Bind(&pluginConfigRequest)
@@ -73,7 +73,7 @@ func (r *DistributeController) StorePluginConfig(ctx http.Context) http.Response
 		FlowID:    pluginConfigRequest.FlowID,
 		ProcessID: pluginConfigRequest.ProcessID,
 		FieldID:   pluginConfigRequest.FieldID,
-	}, PluginConfig{Rules: pluginConfigRequest.Rule})
+	}, PluginConfig{Rules: pluginConfigRequest.Rules})
 	return httpfacades.NewResult(ctx).Success("保存成功", "")
 }
 
@@ -83,7 +83,7 @@ func (r *DistributeController) GetPluginConfig(ctx http.Context) http.Response {
 		FlowID    uint `json:"flow_id" form:"flow_id"`
 		PluginID  uint `json:"plugin_id" form:"plugin_id"`
 		ProcessID uint `json:"process_id" form:"process_id"`
-		Rule      Rule `json:"rule" form:"rule"`
+		Rules     Rule `json:"rules" form:"rules"`
 	}
 	var pluginConfigRequest PluginConfigRequest
 	ctx.Request().Bind(&pluginConfigRequest)
