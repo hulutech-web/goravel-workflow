@@ -53,12 +53,12 @@ func (r *EntryController) EntryData(ctx http.Context) http.Response {
 	query.Model(&models.Entry{}).Where("id=?", id).Find(&entry)
 	query.Model(&models.EntryData{}).Where("entry_id=?", id).Find(&entrydata)
 
-	last_process := models.Process{}
+	last_flowlink := models.Flowlink{}
 	query.Model(&models.Flowlink{}).Where("next_process_id=?", entry.ProcessID).
-		Where("type=?", "Condition").Find(&last_process)
+		Where("type=?", "Condition").Find(&last_flowlink)
 	plugin_configs := official_plugins.PluginConfig{}
 	//找上一个process
-	query.Model(&official_plugins.PluginConfig{}).Where("process_id=?", entry.ProcessID).Find(&plugin_configs)
+	query.Model(&official_plugins.PluginConfig{}).Where("process_id=?", last_flowlink.ProcessID).Find(&plugin_configs)
 	return httpfacades.NewResult(ctx).Success("", http.Json{
 		"entry":          entry,
 		"entrydata":      entrydata,
