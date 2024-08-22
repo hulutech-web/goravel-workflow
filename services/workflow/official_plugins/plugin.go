@@ -37,9 +37,9 @@ type PluginConfig struct {
 }
 
 type RuleItem struct {
-	RuleName  string `json:"rule_name" form:"rule_name"`
-	RuleTitle string `json:"rule_title" form:"rule_title"`
-	RuleValue string `json:"rule_value" form:"rule_value"`
+	RuleID    int    `json:"rule_id" form:"rule_id"`       //部门id
+	RuleLabel string `json:"rule_label" form:"rule_label"` //部门名称
+	RuleValue int    `json:"rule_value" form:"rule_value"` //部门值
 }
 
 type Rule []RuleItem
