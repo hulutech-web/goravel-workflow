@@ -92,7 +92,7 @@ func (r *DistributeController) GetPluginConfig(ctx http.Context) http.Response {
 		Where("field_id=?", pluginConfigRequest.FieldID).
 		Where("flow_id=?", pluginConfigRequest.FlowID).
 		Where("plugin_id=?", pluginConfigRequest.PluginID).
-		Where("process_id=?", pluginConfigRequest.ProcessID).Find(&PluginConfig{})
+		Where("process_id=?", pluginConfigRequest.ProcessID).Find(&pluginConfig)
 	return httpfacades.NewResult(ctx).Success("", pluginConfig)
 }
 
