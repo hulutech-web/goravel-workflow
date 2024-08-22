@@ -51,7 +51,8 @@ func (r *EntryController) EntryData(ctx http.Context) http.Response {
 	var entry models.Entry
 	query := facades.Orm().Query()
 	query.Model(&models.Entry{}).Where("id=?", id).Find(&entry)
-	query.Model(&models.EntryData{}).Where("entry_id=?", id).Find(&entrydata)
+	//当时子流程时，需要查找当前流程的父流程
+	query.Model(&models.EntryData{}).Where("entry_id=?", id).OrWhere("entry_id=?", entry.Pid).Find(&entrydata)
 
 	last_flowlink := models.Flowlink{}
 	query.Model(&models.Flowlink{}).Where("next_process_id=?", entry.ProcessID).
