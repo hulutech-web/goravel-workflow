@@ -48,7 +48,6 @@ func (w *Workflow) RegisterHook(name string, method reflect.Value) {
 	defer w.mutex.Unlock()
 
 	w.hooks[name] = append(w.hooks[name], method)
-	fmt.Printf("Registered hook: %s with method: %v\n", name, method)
 }
 
 // NotifySendOne 调用 NotifySendOne 钩子

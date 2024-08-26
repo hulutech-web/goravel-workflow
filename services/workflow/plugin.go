@@ -50,10 +50,6 @@ func (c *Collector) AddHook(hook string) {
 	c.hooks = append(c.hooks, hook)
 }
 
-func (c *Collector) GetHooks() []string {
-	return c.hooks
-}
-
 // 执行插件中的Execute方法
 func (c *Collector) DoPluginsExec(plugin_name string, args ...interface{}) error {
 	c.mutex.Lock()
