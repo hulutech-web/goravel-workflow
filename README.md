@@ -8,6 +8,9 @@
   <img src="https://github.com/hulutech-web/goravel-workflow/blob/master/assets/flow_preview.png?raw=true" width="800" />
 </p>
 
+### 在线演示
+[地址](http://workflow.xiaohongpao.top/#/auth/login)
+
 ### 文档
 
 使用手册请访问[文档](https://hulutech-web.github.io/goravel-workflow.github.io/)
