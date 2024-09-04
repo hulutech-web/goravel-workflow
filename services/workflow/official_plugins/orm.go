@@ -17,6 +17,7 @@ var gormIns *gormio.DB
 
 func BootMS() *gormio.DB {
 	once.Do(func() {
+		facades.Config().Add("Logger", 1)
 		var gormImpl = gorm.NewGormImpl(facades.Config(), "mysql", db.NewConfigImpl(facades.Config(), "mysql"), gorm.NewDialectorImpl(facades.Config(), "mysql"))
 		gormIns, _ = gormImpl.Make()
 		//关闭打印sql语句
