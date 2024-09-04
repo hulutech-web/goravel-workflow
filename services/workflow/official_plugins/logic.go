@@ -41,10 +41,10 @@ func (c *DistributePlugin) AddHook(hook string) {
 }
 
 func (c *DistributePlugin) AutoMigrate() error {
-	err_ := errors.New("distribute_plugin")
+	err_ := errors.New("")
 	Once.Do(func() {
 		orm := BootMS()
-		err := errors.New("distribute_plugin")
+		err := errors.New("")
 		if !orm.Migrator().HasTable(&Plugin{}) {
 			err = orm.AutoMigrate(&Plugin{})
 		}
@@ -56,10 +56,7 @@ func (c *DistributePlugin) AutoMigrate() error {
 		}
 		if err != nil {
 			err_ = err
-			fmt.Println("AutoMigrate error:", err)
 			// 处理错误
-		} else {
-			fmt.Println("AutoMigrate successful")
 		}
 		row := orm.FirstOrCreate(&Plugin{
 			Name:    "数据二次分配",
@@ -72,9 +69,8 @@ func (c *DistributePlugin) AutoMigrate() error {
 		})
 		if row.RowsAffected == 0 || row.Error != nil {
 			err_ = row.Error
-			fmt.Println("Create error:", err)
 		} else {
-			fmt.Println("Create successful")
+			fmt.Println("AutoMigrate successful")
 		}
 	})
 	return err_
