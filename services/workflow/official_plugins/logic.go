@@ -44,20 +44,19 @@ func (c *DistributePlugin) AutoMigrate() error {
 	err_ := errors.New("")
 	Once.Do(func() {
 		orm := BootMS()
-		err := errors.New("")
-		if !orm.Migrator().HasTable(&Plugin{}) {
-			err = orm.AutoMigrate(&Plugin{})
-		}
-		if !orm.Migrator().HasTable(&PluginConfig{}) {
-			err = orm.AutoMigrate(&PluginConfig{})
-		}
-		if !orm.Migrator().HasTable(&FlowPlugin{}) {
-			err = orm.AutoMigrate(&FlowPlugin{})
-		}
-		if err != nil {
-			err_ = err
-			// 处理错误
-		}
+		err_ = orm.AutoMigrate(&Plugin{})
+		err_ = orm.AutoMigrate(&PluginConfig{})
+		err_ = orm.AutoMigrate(&FlowPlugin{})
+		//if !orm.Migrator().HasTable(&Plugin{}) {
+		//	err = orm.AutoMigrate(&Plugin{})
+		//}
+		//if !orm.Migrator().HasTable(&PluginConfig{}) {
+		//	err = orm.AutoMigrate(&PluginConfig{})
+		//}
+		//if !orm.Migrator().HasTable(&FlowPlugin{}) {
+		//	err = orm.AutoMigrate(&FlowPlugin{})
+		//}
+
 		row := orm.FirstOrCreate(&Plugin{
 			Name:    "数据二次分配",
 			Version: "v1.0",
