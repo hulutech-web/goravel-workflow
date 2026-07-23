@@ -2,6 +2,9 @@ package controllers
 
 import (
 	"fmt"
+	"reflect"
+	"strings"
+
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/goravel/framework/validation"
@@ -11,8 +14,6 @@ import (
 	"github.com/hulutech-web/goravel-workflow/services/workflow/official_plugins"
 	httpfacades "github.com/hulutech-web/http_result"
 	"github.com/spf13/cast"
-	"reflect"
-	"strings"
 )
 
 type EntryController struct {
@@ -94,7 +95,13 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 		With("Process").With("NextProcess").Find(&withFlowlink)
 	//校验提交的数据
 	validRule, validMsg := r.dynamicValidator.DynamicValidate(flow_id)
-	validator, err := facades.Validation().Make(r.dynamicValidator.DynamicValidateField(ctx), validRule, validation.Messages(validMsg))
+	msgMap := make(map[string]string)
+	for k, v := range validMsg {
+		if s, ok := v.(string); ok {
+			msgMap[k] = s
+		}
+	}
+	validator, err := facades.Validation().Make(ctx, r.dynamicValidator.DynamicValidateField(ctx), validRule, validation.Messages(msgMap))
 	if err != nil {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, err.Error(), "")
 	}
@@ -103,6 +110,7 @@ func (r *EntryController) Store(ctx http.Context) http.Response {
 	}
 	query := facades.Orm().Query()
 	var entry models.Entry
+
 	entry.Title = ctx.Request().Input("title")
 	entry.FlowID = cast.ToUint(flow_id)
 	entry.EmpID = user.ID
@@ -203,4 +211,16 @@ func (r *EntryController) Resend(ctx http.Context) http.Response {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "系统错误，请检查", "")
 	}
 	return httpfacades.NewResult(ctx).Success("重发成功", entry)
+}
+
+// Revoke 撤回流程
+func (r *EntryController) Revoke(ctx http.Context) http.Response {
+	var user models.Emp
+	facades.Auth(ctx).User(&user)
+	entry_id := ctx.Request().InputInt("entry_id")
+	err := r.workflow.Revoke(uint(entry_id), user)
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(500, "撤回失败", err.Error())
+	}
+	return httpfacades.NewResult(ctx).Success("撤回成功", nil)
 }

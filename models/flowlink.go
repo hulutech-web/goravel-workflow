@@ -7,10 +7,12 @@ import (
 
 type Flowlink struct {
 	orm.Model
-	Type       string `gorm:"column:type;not null;comment:'Condition:表示步骤流转\\nRole:当前步骤操作人'"`                             // 类型：Condition或Role
-	Auditor    string `gorm:"column:auditor;not null;default:'0';comment:'审批人 系统自动 指定人员 指定部门 指定角色\\ntype=Condition时不启用'"` // 审批人设置
-	Expression string `gorm:"column:expression;not null;default:'';comment:'条件判断表达式\\n为1表示true，通过的话直接进入下一步骤'"`            // 条件判断表达式
-	Sort       int    `gorm:"column:sort;not null;comment:'条件判断顺序'"`                                                      // 判断顺序
+	Type          string `gorm:"column:type;not null;comment:'Condition:表示步骤流转\\nRole:当前步骤操作人'"`                             // 类型：Condition或Role
+	Auditor       string `gorm:"column:auditor;not null;default:'0';comment:'审批人 系统自动 指定人员 指定部门 指定角色\\ntype=Condition时不启用'"` // 审批人设置
+	Expression    string `gorm:"column:expression;not null;default:'';comment:'条件判断表达式\\n为1表示true，通过的话直接进入下一步骤'"`            // 条件判断表达式
+	Sort          int    `gorm:"column:sort;not null;comment:'条件判断顺序'"`                                                              // 判断顺序
+	ConcurrencyType int  `gorm:"column:concurrency_type;not null;default:0;comment:'并签模式: 0=依次, 1=会签, 2=或签'"`                     // 并签模式
+	ApproverRule  string `gorm:"column:approver_rule;not null;default:'';comment:'审批人分配规则: -1003=表单字段, -1004=动态表达式'"`             // 审批人分配规则
 
 	FlowID        uint    `gorm:"column:flow_id"`                         // 流程ID
 	ProcessID     uint    `gorm:"column:process_id"`                      // 当前步骤ID

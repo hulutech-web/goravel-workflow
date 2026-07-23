@@ -50,10 +50,16 @@ func (r *HomeController) Index(ctx http.Context) http.Response {
 	//	query.With("Emp")
 	//}).Where("emp_id=?", user.ID).Where("status !=?", 0).Order("entry_id desc").
 	//	Order("id asc").Group("entry_id").Find(&handle_procs)
+
+	//我的抄送
+	ccRecords := []models.CcRecord{}
+	facades.Orm().Query().Model(&models.CcRecord{}).Where("emp_id=?", emp.ID).Order("id desc").Find(&ccRecords)
+
 	return httpfacades.NewResult(ctx).Success("", map[string]interface{}{
 		"entries":      entries,
 		"procs":        procs,
 		"flows":        flows,
 		"handle_procs": handle_procs,
+		"cc_records":   ccRecords,
 	})
 }

@@ -24,8 +24,8 @@ func (r *TemplateformRequest) Authorize(ctx http.Context) error {
 	return nil
 }
 
-func (r *TemplateformRequest) Rules(ctx http.Context) map[string]string {
-	return map[string]string{
+func (r *TemplateformRequest) Rules(ctx http.Context) map[string]any {
+	return map[string]any{
 		"template_id": "required",
 		"field":       "required|alpha_rule",
 		"field_name":  "required",

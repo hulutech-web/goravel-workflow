@@ -24,6 +24,7 @@ type Process struct {
 	ChildAfter       int       `gorm:"column:child_after;not null;default:2;comment:'子流程结束后 1.同时结束父流程 2.返回父流程'" json:"child_after"`
 	ChildBackProcess int       `gorm:"column:child_back_process;not null;default:0;comment:'子流程结束后返回父流程进程'" json:"child_back_process"`
 	Description      string    `gorm:"column:description;not null;default:'';comment:'步骤描述'" json:"description"`
+	CcEmpIDs         string    `gorm:"column:cc_emp_ids;type:text;comment:'抄送人ID列表,逗号分隔'" json:"cc_emp_ids"`
 	ProcessVars      []Process `gorm:"many2many:process_vars;" json:"process_vars"`
 	Flow             Flow
 }

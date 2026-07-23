@@ -1,31 +1,35 @@
 package official_plugins
 
 import (
-	"github.com/goravel/framework/database/db"
-	"github.com/goravel/framework/database/gorm"
+	"sync"
+
+	"github.com/goravel/framework/contracts/database/driver"
+	gormdriver "github.com/goravel/framework/database/driver"
 	"github.com/goravel/framework/facades"
 	gormio "gorm.io/gorm"
-	"sync"
 )
 
 var (
-	once sync.Once
+	gormIns     *gormio.DB
+	gormInsOnce sync.Once
 )
 
-// 申明一个MYSQL连接GormIns
-var gormIns *gormio.DB
-
 func BootMS() *gormio.DB {
-	once.Do(func() {
-		//临时修改一下
-		facades.Config().Add("app.debug", false)
-		var gormImpl = gorm.NewGormImpl(facades.Config(), "mysql",
-			db.NewConfigImpl(facades.Config(), "mysql"),
-			gorm.NewDialectorImpl(facades.Config(), "mysql"))
-		gormIns, _ = gormImpl.Make()
-		config := facades.Config().Env("APP_DEBUG", false)
-		// 恢复配置
-		facades.Config().Add("app.debug", config)
+	gormInsOnce.Do(func() {
+		driverCallback, exist := facades.Config().Get("database.connections.mysql.via").(func() (driver.Driver, error))
+		if !exist || driverCallback == nil {
+			return
+		}
+		drv, err := driverCallback()
+		if err != nil {
+			return
+		}
+		pool := drv.Pool()
+		db, _, err := gormdriver.BuildGorm(facades.Config(), nil, pool, "mysql", nil)
+		if err != nil {
+			return
+		}
+		gormIns = db
 	})
 	return gormIns
 }

@@ -101,9 +101,12 @@ func (r *FlowlinkController) Update(ctx http.Context) http.Response {
 				tx.Model(&models.Flowlink{}).Where("flow_id=?", flow.ID).Where("type=?", "Condition").
 					Where("process_id=?", newOldId).Update("next_process_id", -1)
 			} else {
-				var fcount int64
-				tx.Model(&models.Flowlink{}).Where("flow_id=?", flow.ID).Where("type=?", "Condition").
-					Where("process_id=?", node.ID).Count(&fcount)
+				fcount, err := tx.Model(&models.Flowlink{}).Where("flow_id=?", flow.ID).Where("type=?", "Condition").
+					Where("process_id=?", node.ID).Count()
+				if err != nil {
+					tx.Rollback()
+					return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "查询失败", err)
+				}
 				if fcount > 0 {
 					tx.Model(&models.Flowlink{}).Where("flow_id=?", flow.ID).Where("type=?", "Condition").
 						Where("process_id=?", node.ID).Update("next_process_id", -1)

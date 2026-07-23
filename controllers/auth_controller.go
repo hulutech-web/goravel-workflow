@@ -21,18 +21,23 @@ func (r *AuthController) AdminLogin(ctx http.Context) http.Response {
 	ctx.Request().Bind(&user)
 	password := user.Password
 	//验证
-	validator, _ := facades.Validation().Make(map[string]any{
+	validator, err := facades.Validation().Make(ctx, map[string]any{
 		"workno":   ctx.Request().Input("workno", ""),
 		"password": ctx.Request().Input("password", ""),
-	}, map[string]string{
+	}, map[string]any{
 		"workno":   "required",
 		"password": "required",
 	}, validation.Messages(map[string]string{
 		"workno.required":   "工号不能为空",
 		"password.required": "密码不能为空",
 	}))
+	if err != nil {
+		return ctx.Response().Status(http.StatusInternalServerError).Json(http.Json{
+			"message": "参数校验失败",
+		})
+	}
 	if validator.Fails() {
-		return ctx.Response().Json(http.StatusUnprocessableEntity, http.Json{
+		return ctx.Response().Status(http.StatusUnprocessableEntity).Json(http.Json{
 			"errors": validator.Errors().All(),
 		})
 	}
@@ -86,18 +91,23 @@ func (r *AuthController) H5Login(ctx http.Context) http.Response {
 	ctx.Request().Bind(&user)
 	password := user.Password
 	//验证
-	validator, _ := facades.Validation().Make(map[string]any{
+	validator, err := facades.Validation().Make(ctx, map[string]any{
 		"mobile":   ctx.Request().Input("mobile", ""),
 		"password": ctx.Request().Input("password", ""),
-	}, map[string]string{
+	}, map[string]any{
 		"mobile":   "required",
 		"password": "required",
 	}, validation.Messages(map[string]string{
-		"mobile.required":   "名称不能为空",
+		"mobile.required":   "手机号不能为空",
 		"password.required": "密码不能为空",
 	}))
+	if err != nil {
+		return ctx.Response().Status(http.StatusInternalServerError).Json(http.Json{
+			"message": "参数校验失败",
+		})
+	}
 	if validator.Fails() {
-		return ctx.Response().Json(http.StatusUnprocessableEntity, http.Json{
+		return ctx.Response().Status(http.StatusUnprocessableEntity).Json(http.Json{
 			"errors": validator.Errors().All(),
 		})
 	}

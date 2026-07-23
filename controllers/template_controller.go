@@ -30,9 +30,9 @@ func (r *TemplateController) Show(ctx http.Context) http.Response {
 }
 
 func (r *TemplateController) Store(ctx http.Context) http.Response {
-	validator, err := facades.Validation().Make(map[string]any{
+	validator, err := facades.Validation().Make(ctx, map[string]any{
 		"template_name": ctx.Request().Input("template_name"),
-	}, map[string]string{
+	}, map[string]any{
 		"template_name": "required|max_len:255"},
 		validation.Messages(map[string]string{
 			"template_name.required": "标题不能为空",

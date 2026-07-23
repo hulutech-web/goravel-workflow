@@ -18,7 +18,7 @@ func Api(app foundation.Application) {
 	router.Get("/api/captcha/get", captchaController.GetCaptcha)
 	router.Post("/api/captcha/validate", captchaController.ValidateCaptcha)
 
-	facades.Route().Middleware(middleware.Jwt()).Prefix("/api").Group(func(router route.Router) {
+	facades.Route().Middleware(middleware.NewJwt()).Prefix("/api").Group(func(router route.Router) {
 
 		//文件上传
 		uploadCtrl := controllers.NewUploadController()
@@ -40,6 +40,7 @@ func Api(app foundation.Application) {
 		router.Post("emp/search", empCtrl.Search)
 		router.Get("emp/options", empCtrl.Options)
 		router.Post("emp/bind", empCtrl.BindUser)
+
 		//流程
 		flowCtrl := controllers.NewFlowController()
 		router.Resource("flow", flowCtrl)
@@ -57,6 +58,8 @@ func Api(app foundation.Application) {
 		router.Get("entry/{id}/entrydata", entryCtrl.EntryData)
 		//流程重发
 		router.Post("entry/resend", entryCtrl.Resend)
+		//撤回流程
+		router.Post("entry/revoke", entryCtrl.Revoke)
 		//流程轨迹
 		flowlinkCtrl := controllers.NewFlowlinkController()
 		router.Post("flowlink", flowlinkCtrl.Update)
@@ -88,5 +91,19 @@ func Api(app foundation.Application) {
 		router.Post("pass", procCtrl.Pass)
 		//驳回
 		router.Post("unpass", procCtrl.UnPass)
+		//撤回
+		router.Post("revoke", procCtrl.Revoke)
+		//加签
+		router.Post("addsign", procCtrl.AddSign)
+		//转交
+		router.Post("transfer", procCtrl.TransferProc)
+		//评论
+		router.Post("comment", procCtrl.AddComment)
+		router.Get("comments/{entry_id}", procCtrl.GetComments)
+
+		//抄送
+		ccCtrl := controllers.NewCcController()
+		router.Get("cc/list", ccCtrl.List)
+		router.Get("cc/entry/{entry_id}", ccCtrl.GetEntryCC)
 	})
 }

@@ -51,12 +51,12 @@ func (r *FlowController) Show(ctx http.Context) http.Response {
 
 func (r *FlowController) Store(ctx http.Context) http.Response {
 
-	validator, _ := facades.Validation().Make(map[string]any{
+	validator, err := facades.Validation().Make(ctx, map[string]any{
 		"flow_no":     ctx.Request().Input("flow_no"),
 		"flow_name":   ctx.Request().Input("flow_name"),
 		"template_id": ctx.Request().InputInt("template_id"),
 		"type_id":     ctx.Request().InputInt("type_id"),
-	}, map[string]string{
+	}, map[string]any{
 		"flow_no":     "required",
 		"flow_name":   "required",
 		"template_id": "required",
@@ -67,11 +67,14 @@ func (r *FlowController) Store(ctx http.Context) http.Response {
 		"template_id.required": "模板不能为空",
 		"type_id.required":     "类型不能为空",
 	}))
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "参数校验失败", err)
+	}
 	if validator.Fails() {
 		return httpfacades.NewResult(ctx).ValidError("参数错误", validator.Errors().All())
 	}
 	flow := models.Flow{}
-	err := validator.Bind(&flow)
+	err = validator.Bind(&flow)
 	if err != nil {
 		return httpfacades.NewResult(ctx).Error(500, "参数错误", map[string]any{})
 	}
@@ -111,16 +114,19 @@ func (r *FlowController) Publish(ctx http.Context) http.Response {
 	if len(process_starts) > 1 {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "发布失败，只能设置一个开始步骤", nil)
 	}
-	var fkCount1 int64
-	facades.Orm().Query().Model(&models.Flowlink{}).Where("flow_id=?", flow_id).Where("type=?", "Condition").
-		Count(&fkCount1)
+	fkCount1, err := facades.Orm().Query().Model(&models.Flowlink{}).Where("flow_id=?", flow_id).Where("type=?", "Condition").Count()
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "查询失败", err)
+	}
 	if fkCount1 <= 1 {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "发布失败，至少需要两个步骤", nil)
 	}
 
-	var fkCount2 int64
-	facades.Orm().Query().Model(&models.Flowlink{}).Where("flow_id=?", flow_id).Where("type=?", "Condition").
-		Where("next_process_id=?", -1).Count(&fkCount2)
+	fkCount2, err := facades.Orm().Query().Model(&models.Flowlink{}).Where("flow_id=?", flow_id).Where("type=?", "Condition").
+		Where("next_process_id=?", -1).Count()
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "查询失败", err)
+	}
 	if fkCount2 > 1 {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "发布失败，有步骤没有创建连线", nil)
 	}
@@ -128,11 +134,13 @@ func (r *FlowController) Publish(ctx http.Context) http.Response {
 		Fid uint `json:"fid"`
 		Pid uint `json:"pid"`
 	}
-	var flowlinkExists bool
 
-	facades.Orm().Query().Table("flowlinks").
+	flowlinkExists, err := facades.Orm().Query().Table("flowlinks").
 		Join("left join processes on flowlinks.process_id=processes.id").
-		Where("flowlinks.flow_id=?", flow_id).Where("processes.position=?", 0).Exists(&flowlinkExists)
+		Where("flowlinks.flow_id=?", flow_id).Where("processes.position=?", 0).Exists()
+	if err != nil {
+		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "查询失败", err)
+	}
 	if !flowlinkExists {
 		return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "发布失败，请设置结束步骤", nil)
 	}
@@ -144,13 +152,15 @@ func (r *FlowController) Publish(ctx http.Context) http.Response {
 		Where("processes.position !=?", 0).
 		Find(&flowlinks)
 	for _, flowlink := range flowlinks {
-		var cConditionMet bool
-		facades.Orm().Query().Table("flowlinks").
+		cConditionMet, err := facades.Orm().Query().Table("flowlinks").
 			Join("join processes on flowlinks.process_id=processes.id").
 			Where("flowlinks.flow_id=?", flow_id).
 			Where("flowlinks.process_id=?", flowlink.ProcessID).
 			Where("flowlinks.type !=?", "Condition").
-			Where("processes.position !=?", 0).Exists(&cConditionMet)
+			Where("processes.position !=?", 0).Exists()
+		if err != nil {
+			return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "查询失败", err)
+		}
 		if !cConditionMet {
 			return httpfacades.NewResult(ctx).
 				Error(http.StatusInternalServerError, "发布失败，请给设置步骤审批权限", nil)

@@ -3,13 +3,14 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
+
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
 	"github.com/hulutech-web/goravel-workflow/controllers/common"
 	models "github.com/hulutech-web/goravel-workflow/models"
 	httpfacades "github.com/hulutech-web/http_result"
 	"github.com/spf13/cast"
-	"strings"
 )
 
 type ProcessController struct {
@@ -136,8 +137,7 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 	}
 
 	if processRequest.ProcessPosition == 9 {
-		var count int64
-		tx.Model(&models.Flowlink{}).Where("process_id=?", id).Count(&count)
+		count, _ := tx.Model(&models.Flowlink{}).Where("process_id=?", id).Count()
 		if count > 1 {
 			return httpfacades.NewResult(ctx).Error(http.StatusInternalServerError, "该节点是分支节点，不能设置为结束或起始步骤", nil)
 		}
@@ -220,11 +220,10 @@ func (r *ProcessController) Update(ctx http.Context) http.Response {
 	for _, conditions := range conditionsMap {
 		for _, condition := range conditions {
 			if condition.Field != "" {
-				var exists_count int64
-				facades.Orm().Query().Model(&models.ProcessVar{}).
+				exists_count, _ := facades.Orm().Query().Model(&models.ProcessVar{}).
 					Where("flow_id=?", flow.ID).
 					Where("process_id=?", id).
-					Where("expression_field=?", condition.Field).Count(&exists_count)
+					Where("expression_field=?", condition.Field).Count()
 				if exists_count == 0 {
 					//新增一条
 					var newProcessVar models.ProcessVar
@@ -447,10 +446,9 @@ func (r *ProcessController) Attribute(ctx http.Context) http.Response {
 
 	processes := []models.Process{}
 	tx.Model(&models.Process{}).Where("flow_id=?", process.FlowID).Find(&processes)
-	var count int64
 	var can_child bool
-	tx.Model(&models.Flowlink{}).Where("process_id=?", process.ID).Where("type=?", "Condition").
-		Count(&count)
+	count, _ := tx.Model(&models.Flowlink{}).Where("process_id=?", process.ID).Where("type=?", "Condition").
+		Count()
 	if count == 1 {
 		can_child = true
 	}
