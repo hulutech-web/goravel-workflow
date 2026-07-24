@@ -33,7 +33,6 @@ func (receiver *ServiceProvider) Register(app foundation.Application) {
 	// 数据库迁移 — 发布 Go 迁移文件（带标签）
 	app.Publishes("github.com/hulutech-web/goravel-workflow", map[string]string{
 		"migrations/2024_06_24_000000_create_workflow_base_tables.go": app.DatabasePath("migrations/2024_06_24_000000_create_workflow_base_tables.go"),
-		"migrations/2026_07_23_000000_add_workflow_features.go":       app.DatabasePath("migrations/2026_07_23_000000_add_workflow_features.go"),
 	}, "migrations")
 
 	// 种子数据
